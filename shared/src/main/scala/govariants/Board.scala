@@ -11,7 +11,7 @@ class Board(val size: Int) {
 
   type Idx = Int
 
-  var grid = Array.ofDim[Option[Color]](size, size)
+  var grid                = Array.ofDim[Option[Color]](size, size)
   val groups: StoneGroups = new StoneGroups(size)
 
   for (i <- 0 until size) {
@@ -34,7 +34,7 @@ class Board(val size: Int) {
         grid(i)(j) match {
           case Some(Black) => print("X ")
           case Some(White) => print("O ")
-          case None => print("+ ")
+          case None        => print("+ ")
         }
       }
       println()
@@ -56,17 +56,17 @@ class Board(val size: Int) {
   def add_stone(x: Int, y: Int, color: Color) = {
     grid(x)(y) = Some(color)
     val neighbors: ListBuffer[(Intersection, Idx, Color)] = get_neighbors(x, y)
-    var stone_idx: Idx = 0
+    var stone_idx: Idx                                    = 0
 
     if (neighbors.length > 0) {
-      var recompute_liberties = false
+      var recompute_liberties            = false
       var idx_processed: ListBuffer[Idx] = ListBuffer()
       for (neighbor <- neighbors) {
         val (intersection, idx, _color) = neighbor
         if (!idx_processed.contains(idx)) {
           if (_color == color) {
             if (stone_idx > 0) {
-              groups.merge(stone_idx, idx) 
+              groups.merge(stone_idx, idx)
             } else {
               groups.add_to_group(x, y, idx)
               stone_idx = idx
@@ -82,7 +82,7 @@ class Board(val size: Int) {
       }
     }
     if (stone_idx == 0) {
-      groups.create_group(x, y, color) 
+      groups.create_group(x, y, color)
     }
   }
 
@@ -90,29 +90,33 @@ class Board(val size: Int) {
     var neighbors: ListBuffer[(Intersection, Idx, Color)] = ListBuffer()
     if (x > 0) {
       grid(x - 1)(y) match {
-        case Some(color) => neighbors ++= 
-          ListBuffer((Intersection(x - 1, y), groups.grid(x - 1)(y), color))
+        case Some(color) =>
+          neighbors ++=
+            ListBuffer((Intersection(x - 1, y), groups.grid(x - 1)(y), color))
         case None =>
       }
     }
     if (x < size - 1) {
       grid(x + 1)(y) match {
-        case Some(color) => neighbors ++= 
-          ListBuffer((Intersection(x + 1, y), groups.grid(x + 1)(y), color))
+        case Some(color) =>
+          neighbors ++=
+            ListBuffer((Intersection(x + 1, y), groups.grid(x + 1)(y), color))
         case None =>
       }
     }
     if (y > 0) {
       grid(x)(y - 1) match {
-        case Some(color) => neighbors ++= 
-          ListBuffer((Intersection(x, y - 1), groups.grid(x)(y - 1), color))
+        case Some(color) =>
+          neighbors ++=
+            ListBuffer((Intersection(x, y - 1), groups.grid(x)(y - 1), color))
         case None =>
       }
     }
     if (y < size - 1) {
       grid(x)(y + 1) match {
-        case Some(color) => neighbors ++= 
-          ListBuffer((Intersection(x, y + 1), groups.grid(x)(y + 1), color))
+        case Some(color) =>
+          neighbors ++=
+            ListBuffer((Intersection(x, y + 1), groups.grid(x)(y + 1), color))
         case None =>
       }
     }
@@ -131,9 +135,7 @@ class Board(val size: Int) {
     }
   }
 
-  def score() = {
-
-  }
+  def score() = {}
 }
 
 @JSExportAll

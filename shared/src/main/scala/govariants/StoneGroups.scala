@@ -10,11 +10,11 @@ import scalajs.js.annotation.{ JSExportAll, JSExportTopLevel }
 class StoneGroups(val size: Int) {
   type Idx = Int
 
-  var idx: Idx = 1
+  var idx: Idx                                        = 1
   var members: HashMap[Idx, ListBuffer[Intersection]] = HashMap()
-  var grid = Array.ofDim[Idx](size, size)
-  var liberties: HashMap[Idx, Int] = HashMap()
-  var color: HashMap[Idx, Color] = HashMap()
+  var grid                                            = Array.ofDim[Idx](size, size)
+  var liberties: HashMap[Idx, Int]                    = HashMap()
+  var color: HashMap[Idx, Color]                      = HashMap()
 
   for (i <- 0 until size) {
     for (j <- 0 until size) {
@@ -71,7 +71,7 @@ class StoneGroups(val size: Int) {
 
   def adjacent_groups(x: Int, y: Int): Set[Idx] = {
     var _adjacent_groups: Set[Idx] = Set()
-    val current_group = grid(x)(y)
+    val current_group              = grid(x)(y)
     if (x > 0 && grid(x - 1)(y) > 0) {
       _adjacent_groups ++= Set(grid(x - 1)(y))
     }

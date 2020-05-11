@@ -9,7 +9,7 @@ object Main extends App {
   game.start()
   game.display()
 
-  while(true) {
+  while (true) {
     val move = get_move(size)
     game.play(move.x, move.y)
     game.display()
@@ -20,13 +20,12 @@ object Main extends App {
     var y: Int = 0
 
     do {
-      val move = readLine("Move ?")
+      val move    = readLine("Move ?")
       var scanner = new Scanner(move).useDelimiter("")
       x = scanner.next().charAt(0) - 'a'
       y = scanner.nextInt() - 1
       println()
-    } 
-    while(x < 0 || x >= size || y < 0 || y >= size)
+    } while (x < 0 || x >= size || y < 0 || y >= size)
 
     Intersection(x, y)
   }
