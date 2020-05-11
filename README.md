@@ -1,1 +1,1 @@
-#Game engine for govariants, writen in Scala
+# Game engine for govariants, writen in Scala
