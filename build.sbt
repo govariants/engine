@@ -1,14 +1,22 @@
 import Dependencies._
 
-ThisBuild / scalaVersion     := "2.13.2"
-ThisBuild / version          := "0.1.0-SNAPSHOT"
-ThisBuild / organization     := "com.example"
+ThisBuild / scalaVersion := "2.13.2"
+ThisBuild / version := "0.1.0-SNAPSHOT"
+ThisBuild / organization := "com.example"
 ThisBuild / organizationName := "example"
 
-lazy val root = (project in file("."))
+lazy val root = project
+  .in(file("."))
+  .aggregate(engine.js, engine.jvm)
   .settings(
     name := "engine",
-    libraryDependencies += scalaTest % Test
+    libraryDependencies += scalaTest % Test,
+    publish := {},
+    publishLocal := {}
   )
 
-// See https://www.scala-sbt.org/1.x/docs/Using-Sonatype.html for instructions on how to publish to Sonatype.
+lazy val engine = crossProject(JSPlatform, JVMPlatform)
+  .in(file("."))
+  .jvmSettings(
+    libraryDependencies += scalaJsStubs % "provided"
+  )
