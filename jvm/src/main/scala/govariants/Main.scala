@@ -11,8 +11,12 @@ object Main extends App {
 
   while (true) {
     val move = get_move(size)
-    game.play(move.x, move.y)
-    game.display()
+    if (!game.move_is_legal(move.x, move.y)) {
+      println("Move is not legal")
+    } else {
+      game.play(move.x, move.y)
+      game.display()
+    }
   }
 
   def get_move(size: Int): Intersection = {
