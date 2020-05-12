@@ -23,8 +23,12 @@ class Game(val size: Int) {
   }
 
   def start(): List[String] = {
-    legal_moves = board.legal_moves()
+    legal_moves = board.legal_moves(turn)
     compute_playable_action()
+  }
+
+  def move_is_legal(x: Int, y: Int): Boolean = {
+    legal_moves.contains(Intersection(x, y))
   }
 
   def play(x: Int, y: Int): List[String] = {
@@ -32,9 +36,9 @@ class Game(val size: Int) {
 
     board.add_stone(x, y, turn)
 
-    legal_moves = board.legal_moves()
-
     switch_turn()
+    legal_moves = board.legal_moves(turn)
+
     compute_playable_action()
   }
 
@@ -43,10 +47,7 @@ class Game(val size: Int) {
   }
 
   def switch_turn() = {
-    turn = turn match {
-      case Black => White
-      case White => Black
-    }
+    turn = turn.opposite
   }
 
   def display() = {

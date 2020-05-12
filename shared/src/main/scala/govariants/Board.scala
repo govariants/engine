@@ -41,16 +41,27 @@ class Board(val size: Int) {
     }
   }
 
-  def legal_moves(): ListBuffer[Intersection] = {
+  def legal_moves(color: Color): ListBuffer[Intersection] = {
     var _legal_moves: ListBuffer[Intersection] = ListBuffer()
-    for (i <- 0 until size) {
-      for (j <- 0 until size) {
-        if (grid(i)(j) == None) {
+    for (i <- 0 until size; j <- 0 until size if grid(i)(j) == None) {
+      if (groups.stone_liberties(i, j).size == 0) {
+        if (move_would_capture(i, j, color)) {
           _legal_moves.append(Intersection(i, j))
         }
+      } else {
+        _legal_moves.append(Intersection(i, j))
       }
     }
     _legal_moves
+  }
+
+  def move_would_capture(x: Int, y: Int, color: Color): Boolean = {
+    for (adjacent_group <- groups.adjacent_groups(x, y)) {
+      if (groups.color(adjacent_group) == color.opposite && groups.liberties(adjacent_group) == 1) {
+        return true
+      }
+    }
+    false
   }
 
   def add_stone(x: Int, y: Int, color: Color) = {
@@ -89,38 +100,27 @@ class Board(val size: Int) {
   def get_neighbors(x: Int, y: Int): ListBuffer[(Intersection, Idx, Color)] = {
     var neighbors: ListBuffer[(Intersection, Idx, Color)] = ListBuffer()
     if (x > 0) {
-      grid(x - 1)(y) match {
-        case Some(color) =>
-          neighbors ++=
-            ListBuffer((Intersection(x - 1, y), groups.grid(x - 1)(y), color))
-        case None =>
-      }
+      add_neighbor(x - 1, y, neighbors)
     }
     if (x < size - 1) {
-      grid(x + 1)(y) match {
-        case Some(color) =>
-          neighbors ++=
-            ListBuffer((Intersection(x + 1, y), groups.grid(x + 1)(y), color))
-        case None =>
-      }
+      add_neighbor(x + 1, y, neighbors)
     }
     if (y > 0) {
-      grid(x)(y - 1) match {
-        case Some(color) =>
-          neighbors ++=
-            ListBuffer((Intersection(x, y - 1), groups.grid(x)(y - 1), color))
-        case None =>
-      }
+      add_neighbor(x, y - 1, neighbors)
     }
     if (y < size - 1) {
-      grid(x)(y + 1) match {
-        case Some(color) =>
-          neighbors ++=
-            ListBuffer((Intersection(x, y + 1), groups.grid(x)(y + 1), color))
-        case None =>
-      }
+      add_neighbor(x, y + 1, neighbors)
     }
     neighbors
+  }
+
+  def add_neighbor(x: Int, y: Int, neighbors: ListBuffer[(Intersection, Idx, Color)]) = {
+    grid(x)(y) match {
+      case Some(color) =>
+        neighbors ++=
+          ListBuffer((Intersection(x, y), groups.grid(x)(y), color))
+      case None =>
+    }
   }
 
   def remove_group(idx: Idx) = {
