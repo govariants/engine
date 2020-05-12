@@ -28,7 +28,7 @@ class Game(val size: Int) {
   }
 
   def move_is_legal(x: Int, y: Int): Boolean = {
-    if (legal_moves.contains(Intersection(x, y))) true else false
+    legal_moves.contains(Intersection(x, y))
   }
 
   def play(x: Int, y: Int): List[String] = {

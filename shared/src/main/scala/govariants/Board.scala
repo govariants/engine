@@ -43,17 +43,13 @@ class Board(val size: Int) {
 
   def legal_moves(color: Color): ListBuffer[Intersection] = {
     var _legal_moves: ListBuffer[Intersection] = ListBuffer()
-    for (i <- 0 until size) {
-      for (j <- 0 until size) {
-        if (grid(i)(j) == None) {
-          if (groups.stone_liberties(i, j).size == 0) {
-            if (move_would_capture(i, j, color)) {
-              _legal_moves.append(Intersection(i, j))
-            }
-          } else {
-            _legal_moves.append(Intersection(i, j))
-          }
+    for (i <- 0 until size; j <- 0 until size if grid(i)(j) == None) {
+      if (groups.stone_liberties(i, j).size == 0) {
+        if (move_would_capture(i, j, color)) {
+          _legal_moves.append(Intersection(i, j))
         }
+      } else {
+        _legal_moves.append(Intersection(i, j))
       }
     }
     _legal_moves
@@ -61,7 +57,7 @@ class Board(val size: Int) {
 
   def move_would_capture(x: Int, y: Int, color: Color): Boolean = {
     for (adjacent_group <- groups.adjacent_groups(x, y)) {
-      if (groups.color(adjacent_group) == color.opposite && groups.liberties(adjacent_group) - 1 == 0) {
+      if (groups.color(adjacent_group) == color.opposite && groups.liberties(adjacent_group) == 1) {
         return true
       }
     }
