@@ -28,5 +28,6 @@ lazy val root = project
 lazy val engine = crossProject(JSPlatform, JVMPlatform)
   .in(file("."))
   .jvmSettings(
-    libraryDependencies += scalaJsStubs % "provided"
+    libraryDependencies += scalaJsStubs % "provided",
+    libraryDependencies += scalaTest % Test
   )
