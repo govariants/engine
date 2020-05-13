@@ -1,6 +1,7 @@
 package org.govariants.engine
 
 import scala.collection.mutable.ListBuffer
+import scala.collection.mutable.HashMap
 
 import scalajs.js.annotation.{ JSExportAll, JSExportTopLevel }
 
@@ -20,25 +21,27 @@ class Board(val size: Int) {
     }
   }
 
-  def display() = {
-    print("  ")
+  def as_string(): String = {
+    val string = new StringBuilder("  ")
     for (i <- 0 until size) {
-      print(('a' + i).asInstanceOf[Char])
-      print(" ")
+      string += ('a' + i).asInstanceOf[Char]
+      string += ' '
     }
-    println()
+    string += '\n'
     for (j <- 0 until size) {
-      print(j + 1)
-      print(" ")
+      string ++= (j + 1).toString
+      string += ' '
       for (i <- 0 until size) {
         grid(i)(j) match {
-          case Some(Black) => print("X ")
-          case Some(White) => print("O ")
-          case None        => print("+ ")
+          case Some(Black) => string += 'X'
+          case Some(White) => string += 'O'
+          case None        => string += '+'
         }
+        if (i < size - 1) string += ' '
       }
-      println()
+      string += '\n'
     }
+    string.toString
   }
 
   def legal_moves(color: Color): ListBuffer[Intersection] = {
@@ -131,6 +134,45 @@ class Board(val size: Int) {
     }
     for (group <- adjacent_groups) {
       groups.update_liberties(group)
+    }
+  }
+
+  def compute_groups_from_scratch() = {
+    val visited: HashMap[Intersection, Boolean] = HashMap()
+    for (i <- 0 until size; j <- 0 until size) {
+      visited.addOne((Intersection(i, j), false))
+    }
+    for (i <- 0 until size; j <- 0 until size if grid(i)(j) != None && groups.grid(i)(j) == 0) {
+      search_connected_stones_recursive(i, j, grid(i)(j).get, 0, visited)
+    }
+
+    def search_connected_stones_recursive(
+        x: Int,
+        y: Int,
+        color: Color,
+        _idx: Idx,
+        visited: HashMap[Intersection, Boolean]
+    ) {
+      visited(Intersection(x, y)) = true
+      var idx = _idx
+      if (idx == 0) {
+        groups.create_group(x, y, color)
+        idx = groups.grid(x)(y)
+      } else {
+        groups.add_to_group(x, y, idx)
+      }
+      for (
+        neighbor <- get_neighbors(x, y)
+          .filter(stone)
+          .filter(stone => same_color(stone, color))
+          .filterNot(visited)
+      ) {
+        search_connected_stones_recursive(neighbor.x, neighbor.y, color, idx, visited)
+      }
+    }
+
+    def same_color(intersection: Intersection, color: Color): Boolean = {
+      grid(intersection.x)(intersection.y).get == color
     }
   }
 
