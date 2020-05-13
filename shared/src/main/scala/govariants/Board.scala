@@ -12,7 +12,7 @@ class Board(val size: Int) {
   type Idx = Int
 
   var grid                = Array.ofDim[Option[Color]](size, size)
-  val groups: StoneGroups = new StoneGroups(size)
+  val groups: StoneGroups = new StoneGroups(size, this)
 
   for (i <- 0 until size) {
     for (j <- 0 until size) {
@@ -66,14 +66,13 @@ class Board(val size: Int) {
 
   def add_stone(x: Int, y: Int, color: Color) = {
     grid(x)(y) = Some(color)
-    val neighbors: ListBuffer[(Intersection, Idx, Color)] = get_neighbors(x, y)
-    var stone_idx: Idx                                    = 0
+    val neighbors: ListBuffer[Intersection] = get_neighbors(x, y).filter(stone)
+    var stone_idx: Idx                      = 0
 
     if (neighbors.length > 0) {
-      var recompute_liberties            = false
       var idx_processed: ListBuffer[Idx] = ListBuffer()
       for (neighbor <- neighbors) {
-        val (intersection, idx, _color) = neighbor
+        val (idx, _color) = stone_idx_and_color(neighbor)
         if (!idx_processed.contains(idx)) {
           if (_color == color) {
             if (stone_idx > 0) {
@@ -97,30 +96,30 @@ class Board(val size: Int) {
     }
   }
 
-  def get_neighbors(x: Int, y: Int): ListBuffer[(Intersection, Idx, Color)] = {
-    var neighbors: ListBuffer[(Intersection, Idx, Color)] = ListBuffer()
-    if (x > 0) {
-      add_neighbor(x - 1, y, neighbors)
-    }
-    if (x < size - 1) {
-      add_neighbor(x + 1, y, neighbors)
-    }
-    if (y > 0) {
-      add_neighbor(x, y - 1, neighbors)
-    }
-    if (y < size - 1) {
-      add_neighbor(x, y + 1, neighbors)
-    }
-    neighbors
+  def stone(intersection: Intersection): Boolean = {
+    grid(intersection.x)(intersection.y) != None
   }
 
-  def add_neighbor(x: Int, y: Int, neighbors: ListBuffer[(Intersection, Idx, Color)]) = {
-    grid(x)(y) match {
-      case Some(color) =>
-        neighbors ++=
-          ListBuffer((Intersection(x, y), groups.grid(x)(y), color))
-      case None =>
+  def stone_idx_and_color(intersection: Intersection): (Idx, Color) = {
+    val idx = groups.grid(intersection.x)(intersection.y)
+    (idx, groups.color(idx))
+  }
+
+  def get_neighbors(x: Int, y: Int): ListBuffer[Intersection] = {
+    val neighbors: ListBuffer[Intersection] = ListBuffer()
+    if (x > 0) {
+      neighbors ++= ListBuffer(Intersection(x - 1, y))
     }
+    if (x < size - 1) {
+      neighbors ++= ListBuffer(Intersection(x + 1, y))
+    }
+    if (y > 0) {
+      neighbors ++= ListBuffer(Intersection(x, y - 1))
+    }
+    if (y < size - 1) {
+      neighbors ++= ListBuffer(Intersection(x, y + 1))
+    }
+    neighbors
   }
 
   def remove_group(idx: Idx) = {

@@ -7,7 +7,7 @@ import scalajs.js.annotation.{ JSExportAll, JSExportTopLevel }
 
 @JSExportAll
 @JSExportTopLevel("StoneGroups")
-class StoneGroups(val size: Int) {
+class StoneGroups(val size: Int, val board: Board) {
   type Idx = Int
 
   var idx: Idx                                        = 1
@@ -53,37 +53,14 @@ class StoneGroups(val size: Int) {
   }
 
   def stone_liberties(x: Int, y: Int): Set[Intersection] = {
-    var liberties_coord: Set[Intersection] = Set()
-    if (x > 0 && grid(x - 1)(y) == 0) {
-      liberties_coord ++= Set(Intersection(x - 1, y))
-    }
-    if (x < size - 1 && grid(x + 1)(y) == 0) {
-      liberties_coord ++= Set(Intersection(x + 1, y))
-    }
-    if (y > 0 && grid(x)(y - 1) == 0) {
-      liberties_coord ++= Set(Intersection(x, y - 1))
-    }
-    if (y < size - 1 && grid(x)(y + 1) == 0) {
-      liberties_coord ++= Set(Intersection(x, y + 1))
-    }
-    liberties_coord
+    board.get_neighbors(x, y).filterNot(board.stone).toSet
   }
 
   def adjacent_groups(x: Int, y: Int): Set[Idx] = {
-    var _adjacent_groups: Set[Idx] = Set()
-    val current_group              = grid(x)(y)
-    if (x > 0 && grid(x - 1)(y) > 0) {
-      _adjacent_groups ++= Set(grid(x - 1)(y))
-    }
-    if (x < size - 1 && grid(x + 1)(y) > 0) {
-      _adjacent_groups ++= Set(grid(x + 1)(y))
-    }
-    if (y > 0 && grid(x)(y - 1) > 0) {
-      _adjacent_groups ++= Set(grid(x)(y - 1))
-    }
-    if (y < size - 1 && grid(x)(y + 1) > 0) {
-      _adjacent_groups ++= Set(grid(x)(y + 1))
-    }
-    _adjacent_groups - current_group
+    board
+      .get_neighbors(x, y)
+      .map(intersection => grid(intersection.x)(intersection.y))
+      .filter(idx => idx > 0 && idx != grid(x)(y))
+      .toSet
   }
 }
