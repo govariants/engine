@@ -1,7 +1,6 @@
 package org.govariants.engine
 
 import scala.collection.mutable.ListBuffer
-import scala.collection.mutable.HashMap
 
 import scalajs.js.annotation.{ JSExportAll, JSExportTopLevel }
 
@@ -21,7 +20,7 @@ class Board(val size: Int) {
     }
   }
 
-  def as_string(): String = {
+  override def toString(): String = {
     val string = new StringBuilder("  ")
     for (i <- 0 until size) {
       string += ('a' + i).asInstanceOf[Char]
@@ -138,10 +137,7 @@ class Board(val size: Int) {
   }
 
   def compute_groups_from_scratch() = {
-    val visited: HashMap[Intersection, Boolean] = HashMap()
-    for (i <- 0 until size; j <- 0 until size) {
-      visited.addOne((Intersection(i, j), false))
-    }
+    var visited: Set[Intersection] = Set()
     for (i <- 0 until size; j <- 0 until size if grid(i)(j) != None && groups.grid(i)(j) == 0) {
       search_connected_stones_recursive(i, j, grid(i)(j).get, 0, visited)
     }
@@ -151,10 +147,10 @@ class Board(val size: Int) {
         y: Int,
         color: Color,
         _idx: Idx,
-        visited: HashMap[Intersection, Boolean]
+        _visited: Set[Intersection]
     ) {
-      visited(Intersection(x, y)) = true
-      var idx = _idx
+      var visited = _visited + Intersection(x, y)
+      var idx     = _idx
       if (idx == 0) {
         groups.create_group(x, y, color)
         idx = groups.grid(x)(y)

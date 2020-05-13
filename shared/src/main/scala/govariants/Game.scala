@@ -51,7 +51,7 @@ class Game(val size: Int) {
   }
 
   def display() = {
-    println(board.as_string())
+    println(board.toString())
     println()
   }
 }

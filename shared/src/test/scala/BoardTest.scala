@@ -29,7 +29,7 @@ class BoardTest extends FunSuite {
                         |+ + + + + + + + +""".stripMargin
     val board_2 = board_from_string(board_2_str)
 
-    assert(board_1.as_string() == board_2.as_string())
+    assert(board_1.toString() == board_2.toString())
   }
 
   test("Multiple stones capture") {
@@ -57,7 +57,7 @@ class BoardTest extends FunSuite {
                         |+ + + + + + + + +""".stripMargin
     val board_2 = board_from_string(board_2_str)
 
-    assert(board_1.as_string() == board_2.as_string())
+    assert(board_1.toString() == board_2.toString())
   }
 
   def board_from_string(board_str: String): Board = {
