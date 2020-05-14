@@ -1,5 +1,3 @@
-import Dependencies._
-
 ThisBuild / scalaVersion := "2.13.2"
 ThisBuild / version := "0.1.0-SNAPSHOT"
 ThisBuild / organization := "com.example"
@@ -20,14 +18,15 @@ lazy val root = project
   .settings(
     name := "engine",
     commonSettings,
-    libraryDependencies += scalaTest % Test,
     publish := {},
     publishLocal := {}
   )
 
 lazy val engine = crossProject(JSPlatform, JVMPlatform)
   .in(file("."))
+  .settings(
+    libraryDependencies += "org.scalatest" %%% "scalatest" % "3.1.1" % Test
+  )
   .jvmSettings(
-    libraryDependencies += scalaJsStubs % "provided",
-    libraryDependencies += scalaTest % Test
+    libraryDependencies += "org.scala-js" %% "scalajs-stubs" % "1.0.0" % "provided"
   )
