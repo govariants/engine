@@ -68,9 +68,9 @@ class BoardTest extends FunSuite {
       assert(line.split(" ").length == board.size, "Board size is inconsistent")
       for (char <- line.split(' ')) {
         char match {
-          case "+" => board.grid(i)(j) = None
-          case "X" => board.grid(i)(j) = Some(Black)
-          case "O" => board.grid(i)(j) = Some(White)
+          case "+" => board.grid.set(i, j, None)
+          case "X" => board.grid.set(i, j, Some(Black))
+          case "O" => board.grid.set(i, j, Some(White))
           case _   => assert(false, "Board char not recognized")
         }
         i += 1

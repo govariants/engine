@@ -3,20 +3,22 @@ package org.govariants.engine
 import scala.collection.mutable.ListBuffer
 
 import scalajs.js.annotation.{ JSExportAll, JSExportTopLevel }
+import org.govariants.engine.datastructures.GridBuilder
 
 @JSExportAll
 @JSExportTopLevel("Board")
-class Board(val size: Int) {
+class Board(val size: Int)(implicit grid_builder: GridBuilder) {
   assert(size > 0, "size must be > 0")
 
   type Idx = Int
 
-  var grid                = Array.ofDim[Option[Color]](size, size)
+  val grid = grid_builder.build(size)
+
   val groups: StoneGroups = new StoneGroups(size, this)
 
   for (i <- 0 until size) {
     for (j <- 0 until size) {
-      grid(i)(j) = None
+      grid.set(i, j, None)
     }
   }
 
@@ -31,7 +33,7 @@ class Board(val size: Int) {
       string ++= (j + 1).toString
       string += ' '
       for (i <- 0 until size) {
-        grid(i)(j) match {
+        grid.get(i, j) match {
           case Some(Black) => string += 'X'
           case Some(White) => string += 'O'
           case None        => string += '+'
@@ -45,7 +47,7 @@ class Board(val size: Int) {
 
   def legal_moves(color: Color): ListBuffer[Intersection] = {
     var _legal_moves: ListBuffer[Intersection] = ListBuffer()
-    for (i <- 0 until size; j <- 0 until size if grid(i)(j) == None) {
+    for (i <- 0 until size; j <- 0 until size if grid.get(i, j) == None) {
       if (groups.stone_liberties(i, j).size == 0) {
         if (move_would_capture(i, j, color)) {
           _legal_moves.append(Intersection(i, j))
@@ -67,7 +69,7 @@ class Board(val size: Int) {
   }
 
   def add_stone(x: Int, y: Int, color: Color) = {
-    grid(x)(y) = Some(color)
+    grid.set(x, y, Some(color))
     val neighbors: ListBuffer[Intersection] = get_neighbors(x, y).filter(stone)
     var stone_idx: Idx                      = 0
 
@@ -99,7 +101,7 @@ class Board(val size: Int) {
   }
 
   def stone(intersection: Intersection): Boolean = {
-    grid(intersection.x)(intersection.y) != None
+    grid.get(intersection).isDefined
   }
 
   def stone_idx_and_color(intersection: Intersection): (Idx, Color) = {
@@ -127,7 +129,7 @@ class Board(val size: Int) {
   def remove_group(idx: Idx) = {
     var adjacent_groups: Set[Idx] = Set()
     for (intersection <- groups.members(idx)) {
-      grid(intersection.x)(intersection.y) = None
+      grid.set(intersection, None)
       groups.grid(intersection.x)(intersection.y) = 0
       adjacent_groups ++= groups.adjacent_groups(intersection.x, intersection.y)
     }
@@ -138,8 +140,8 @@ class Board(val size: Int) {
 
   def compute_groups_from_scratch() = {
     var visited: Set[Intersection] = Set()
-    for (i <- 0 until size; j <- 0 until size if grid(i)(j) != None && groups.grid(i)(j) == 0) {
-      search_connected_stones_recursive(i, j, grid(i)(j).get, 0, visited)
+    for (i <- 0 until size; j <- 0 until size if grid.get(i, j) != None && groups.grid(i)(j) == 0) {
+      search_connected_stones_recursive(i, j, grid.get(i, j).get, 0, visited)
     }
 
     def search_connected_stones_recursive(
@@ -168,13 +170,9 @@ class Board(val size: Int) {
     }
 
     def same_color(intersection: Intersection, color: Color): Boolean = {
-      grid(intersection.x)(intersection.y).get == color
+      grid.get(intersection).get == color
     }
   }
 
   def score() = {}
 }
-
-@JSExportAll
-@JSExportTopLevel("Intersection")
-case class Intersection(val x: Int, val y: Int)
