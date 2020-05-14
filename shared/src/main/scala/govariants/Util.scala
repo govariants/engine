@@ -1,7 +1,6 @@
 package org.govariants.engine
 import scalajs.js.annotation.{ JSExportTopLevel }
 
-@JSExportTopLevel("Color")
 sealed trait Color {
   val opposite: Color
 }
