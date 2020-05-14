@@ -14,7 +14,7 @@ class BoardTest extends FunSuite {
                         |+ + + + + + + + +
                         |+ + + + + + + + +
                         |+ + + + + + + + +""".stripMargin
-    val board_1 = board_from_string(board_1_str)
+    val board_1     = board_from_string(board_1_str)
 
     board_1.add_stone(2, 4, Black)
 
@@ -27,7 +27,7 @@ class BoardTest extends FunSuite {
                         |+ + + + + + + + +
                         |+ + + + + + + + +
                         |+ + + + + + + + +""".stripMargin
-    val board_2 = board_from_string(board_2_str)
+    val board_2     = board_from_string(board_2_str)
 
     assert(board_1.toString() == board_2.toString())
   }
@@ -42,7 +42,7 @@ class BoardTest extends FunSuite {
                         |+ + + + X + + + +
                         |+ + + + + + + + +
                         |+ + + + + + + + +""".stripMargin
-    val board_1 = board_from_string(board_1_str)
+    val board_1     = board_from_string(board_1_str)
 
     board_1.add_stone(4, 2, Black)
 
@@ -55,14 +55,14 @@ class BoardTest extends FunSuite {
                         |+ + + + X + + + +
                         |+ + + + + + + + +
                         |+ + + + + + + + +""".stripMargin
-    val board_2 = board_from_string(board_2_str)
+    val board_2     = board_from_string(board_2_str)
 
     assert(board_1.toString() == board_2.toString())
   }
 
   def board_from_string(board_str: String): Board = {
     val board = new Board(board_str.split('\n').length)
-    var j = 0
+    var j     = 0
     for (line <- board_str.split('\n')) {
       var i = 0
       assert(line.split(" ").length == board.size, "Board size is inconsistent")
