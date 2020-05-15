@@ -1,4 +1,0 @@
-Ko support
-Better liberty count instead of recomputing at each stone capture
-Non-square board support
-Board scoring
