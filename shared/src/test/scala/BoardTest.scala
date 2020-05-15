@@ -1,5 +1,6 @@
 package org.govariants.engine
 
+import scala.io.Source
 import org.scalatest.FunSuite
 
 class BoardTest extends FunSuite {
@@ -58,6 +59,28 @@ class BoardTest extends FunSuite {
     val board_2     = board_from_string(board_2_str)
 
     assert(board_1.toString() == board_2.toString())
+  }
+
+  test("Full 9x9 game") {
+    val sgf_file = Source.fromFile("9x9.sgf")
+    val sgf_string =  sgf_file.getLines.mkString
+    sgf_file.close
+    val sgf_parser: SGFParser = new SGFParser(sgf_string)
+
+    val board = sgf_parser.build_board()
+
+    val target_board_str = """|+ + + + O O X + +
+                              |+ + O + O X X X +
+                              |+ O + O O O X + +
+                              |+ O O X X O X + +
+                              |+ O O O X X + X X
+                              |+ O + O O X X + X
+                              |+ + O X X X O X +
+                              |+ O X X X O + O X
+                              |+ O O X X + O + +""".stripMargin
+    val target_board = board_from_string(target_board_str)
+
+    assert(board.toString == target_board.toString())
   }
 
   def board_from_string(board_str: String): Board = {
