@@ -2,8 +2,6 @@ package org.govariants.engine
 
 import scalajs.js.annotation.{ JSExportAll, JSExportTopLevel }
 
-import scala.collection.mutable.ListBuffer
-
 @JSExportAll
 @JSExportTopLevel("SGFParser")
 class SGFParser(val sgf_string: String) {
