@@ -12,15 +12,9 @@ class Board(val size: Int)(implicit grid_builder: GridBuilder) {
 
   type Idx = Int
 
-  val grid = grid_builder.build(size)
+  val grid = grid_builder.build[Option[Color]](size, None)
 
   val groups: StoneGroups = new StoneGroups(size, this)
-
-  for (i <- 0 until size) {
-    for (j <- 0 until size) {
-      grid.set(i, j, None)
-    }
-  }
 
   override def toString(): String = {
     val string = new StringBuilder("  ")
