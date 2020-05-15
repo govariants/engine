@@ -11,10 +11,10 @@ class StoneGroups(val size: Int, val board: Board) {
   type Idx = Int
 
   var idx: Idx                                        = 1
-  var members: HashMap[Idx, ListBuffer[Intersection]] = HashMap()
-  var grid                                            = Array.ofDim[Idx](size, size)
-  var liberties: HashMap[Idx, Int]                    = HashMap()
-  var color: HashMap[Idx, Color]                      = HashMap()
+  val members: HashMap[Idx, ListBuffer[Intersection]] = HashMap()
+  val grid                                            = Array.ofDim[Idx](size, size)
+  val liberties: HashMap[Idx, Int]                    = HashMap()
+  val color: HashMap[Idx, Color]                      = HashMap()
 
   for (i <- 0 until size) {
     for (j <- 0 until size) {
