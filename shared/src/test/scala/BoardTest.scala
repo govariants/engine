@@ -1,9 +1,9 @@
 package org.govariants.engine
 
 import scala.io.Source
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class BoardTest extends FunSuite {
+class BoardTest extends AnyFunSuite {
 
   test("Simple capture one stone") {
     val board_1_str = """+ + + + + + + + +
@@ -62,8 +62,8 @@ class BoardTest extends FunSuite {
   }
 
   test("Full 9x9 game") {
-    val sgf_file = Source.fromFile("9x9.sgf")
-    val sgf_string =  sgf_file.getLines.mkString
+    val sgf_file   = Source.fromFile("9x9.sgf")
+    val sgf_string = sgf_file.getLines.mkString
     sgf_file.close
     val sgf_parser: SGFParser = new SGFParser(sgf_string)
 
@@ -78,7 +78,7 @@ class BoardTest extends FunSuite {
                               |+ + O X X X O X +
                               |+ O X X X O + O X
                               |+ O O X X + O + +""".stripMargin
-    val target_board = board_from_string(target_board_str)
+    val target_board     = board_from_string(target_board_str)
 
     assert(board.toString == target_board.toString())
   }

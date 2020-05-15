@@ -3,21 +3,11 @@ ThisBuild / version := "0.1.0-SNAPSHOT"
 ThisBuild / organization := "com.example"
 ThisBuild / organizationName := "example"
 
-lazy val commonSettings = List(
-  scalacOptions ++= Seq(
-    "-deprecation",
-    "-unchecked",
-    "-Xlint",
-    "-Xfatal-warnings"
-  )
-)
-
 lazy val root = project
   .in(file("."))
   .aggregate(engine.js, engine.jvm)
   .settings(
     name := "engine",
-    commonSettings,
     publish := {},
     publishLocal := {}
   )
@@ -25,6 +15,12 @@ lazy val root = project
 lazy val engine = crossProject(JSPlatform, JVMPlatform)
   .in(file("."))
   .settings(
+    scalacOptions ++= Seq(
+      "-deprecation",
+      "-unchecked",
+      "-Xlint",
+      "-Xfatal-warnings"
+    ),
     libraryDependencies += "org.scalatest" %%% "scalatest" % "3.1.1" % Test
   )
   .jvmSettings(
