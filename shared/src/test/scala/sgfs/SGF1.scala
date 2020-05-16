@@ -1,4 +1,8 @@
-(;
+package org.govariants.engine
+package sgfs
+
+object SGF1 {
+  val content = raw"""(;
 FF[4]
 CA[UTF-8]
 GM[1]
@@ -17,4 +21,5 @@ AP[maxiGos:6.67]
 ;B[dh];W[fa];B[gb];W[hf];B[cf]
 ;W[ce];B[hg];W[bi];B[di];W[hf]
 ;B[cc];W[cb];B[hg];W[bc];B[ih]
-;W[];B[])
+;W[];B[])"""
+}
