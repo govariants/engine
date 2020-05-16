@@ -1,6 +1,5 @@
 package org.govariants.engine
 
-import scala.io.Source
 import org.scalatest.funsuite.AnyFunSuite
 
 class BoardTest extends AnyFunSuite {
@@ -62,9 +61,7 @@ class BoardTest extends AnyFunSuite {
   }
 
   test("Full 9x9 game") {
-    val sgf_file   = Source.fromFile("9x9.sgf")
-    val sgf_string = sgf_file.getLines.mkString
-    sgf_file.close
+    val sgf_string            = sgfs.SGF1.content
     val sgf_parser: SGFParser = new SGFParser(sgf_string)
 
     val board = sgf_parser.build_board()
