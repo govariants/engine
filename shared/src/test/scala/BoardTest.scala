@@ -16,7 +16,7 @@ class BoardTest extends AnyFunSuite {
                         |+ + + + + + + + +""".stripMargin
     val board_1     = board_from_string(board_1_str)
 
-    board_1.add_stone(2, 4, Black)
+    board_1.add_stone(Intersection(2, 4), Black)
 
     val board_2_str = """+ + + + + + + + +
                         |+ X X + + + + + +
@@ -44,7 +44,7 @@ class BoardTest extends AnyFunSuite {
                         |+ + + + + + + + +""".stripMargin
     val board_1     = board_from_string(board_1_str)
 
-    board_1.add_stone(4, 2, Black)
+    board_1.add_stone(Intersection(4, 2), Black)
 
     val board_2_str = """+ + + + X X X + +
                         |+ X + X + + + X +
@@ -89,8 +89,8 @@ class BoardTest extends AnyFunSuite {
       for (char <- line.split(' ')) {
         char match {
           case "+" =>
-          case "X" => board.add_stone(i, j, Black)
-          case "O" => board.add_stone(i, j, White)
+          case "X" => board.add_stone(Intersection(i, j), Black)
+          case "O" => board.add_stone(Intersection(i, j), White)
           case _   => assert(false, "Board char not recognized")
         }
         i += 1

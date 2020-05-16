@@ -17,7 +17,10 @@ class SGFParser(val sgf_string: String) {
     val board = new Board(size)
 
     for (m <- move_regex.findAllMatchIn(sgf_string)) {
-      board.add_stone(letter_to_int(m.group(2)), letter_to_int(m.group(3)), letter_to_color(m.group(1)))
+      board.add_stone(
+        Intersection(letter_to_int(m.group(2)), letter_to_int(m.group(3))),
+        letter_to_color(m.group(1))
+      )
     }
 
     board

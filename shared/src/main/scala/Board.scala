@@ -42,8 +42,8 @@ class Board(val size: Int)(implicit grid_builder: GridBuilder) {
   def legal_moves(color: Color): ListBuffer[Intersection] = {
     val _legal_moves: ListBuffer[Intersection] = ListBuffer()
     for (i <- 0 until size; j <- 0 until size if grid.get(i, j) == None) {
-      if (groups.stone_liberties(i, j).size == 0) {
-        if (move_would_capture(i, j, color)) {
+      if (groups.stone_liberties(Intersection(i, j)).size == 0) {
+        if (move_would_capture(Intersection(i, j), color)) {
           _legal_moves.append(Intersection(i, j))
         }
       } else {
@@ -53,13 +53,15 @@ class Board(val size: Int)(implicit grid_builder: GridBuilder) {
     _legal_moves
   }
 
-  def move_would_capture(x: Int, y: Int, color: Color): Boolean = {
-    groups.adjacent(x, y) exists (idx => groups.color(idx) == color.opposite && groups.liberties(idx) == 1)
+  def move_would_capture(intersection: Intersection, color: Color): Boolean = {
+    groups.adjacent(intersection) exists (idx =>
+      groups.color(idx) == color.opposite && groups.liberties_count(idx) == 1
+    )
   }
 
-  def add_stone(x: Int, y: Int, color: Color) = {
-    grid.set(x, y, Some(color))
-    val neighbors: ListBuffer[Intersection] = get_neighbors(x, y).filter(stone)
+  def add_stone(intersection: Intersection, color: Color) = {
+    grid.set(intersection, Some(color))
+    val neighbors: ListBuffer[Intersection] = get_neighbors(intersection).filter(is_stone)
     var stone_idx: Idx                      = 0
 
     if (neighbors.length > 0) {
@@ -71,12 +73,12 @@ class Board(val size: Int)(implicit grid_builder: GridBuilder) {
             if (stone_idx > 0) {
               groups.merge(stone_idx, idx)
             } else {
-              groups.add(x, y, idx)
+              groups.add(intersection, idx)
               stone_idx = idx
             }
           } else {
-            groups.liberties(idx) -= 1
-            if (groups.liberties(idx) == 0) {
+            groups.liberties_count(idx) -= 1
+            if (groups.liberties_count(idx) == 0) {
               for (stone <- groups.members(idx)) {
                 grid.set(stone, None)
               }
@@ -88,32 +90,32 @@ class Board(val size: Int)(implicit grid_builder: GridBuilder) {
       }
     }
     if (stone_idx == 0) {
-      groups.create(x, y, color)
+      groups.create(intersection, color)
     }
   }
 
-  def stone(intersection: Intersection): Boolean = {
+  def is_stone(intersection: Intersection): Boolean = {
     grid.get(intersection).isDefined
   }
 
   def stone_idx_and_color(intersection: Intersection): (Idx, Color) = {
-    val idx = groups.grid.get(intersection)
+    val idx = groups.indexes.get(intersection)
     (idx, groups.color(idx))
   }
 
-  def get_neighbors(x: Int, y: Int): ListBuffer[Intersection] = {
+  def get_neighbors(intersection: Intersection): ListBuffer[Intersection] = {
     val neighbors: ListBuffer[Intersection] = ListBuffer()
-    if (x > 0) {
-      neighbors ++= ListBuffer(Intersection(x - 1, y))
+    if (intersection.x > 0) {
+      neighbors ++= ListBuffer(Intersection(intersection.x - 1, intersection.y))
     }
-    if (x < size - 1) {
-      neighbors ++= ListBuffer(Intersection(x + 1, y))
+    if (intersection.x < size - 1) {
+      neighbors ++= ListBuffer(Intersection(intersection.x + 1, intersection.y))
     }
-    if (y > 0) {
-      neighbors ++= ListBuffer(Intersection(x, y - 1))
+    if (intersection.y > 0) {
+      neighbors ++= ListBuffer(Intersection(intersection.x, intersection.y - 1))
     }
-    if (y < size - 1) {
-      neighbors ++= ListBuffer(Intersection(x, y + 1))
+    if (intersection.y < size - 1) {
+      neighbors ++= ListBuffer(Intersection(intersection.x, intersection.y + 1))
     }
     neighbors
   }

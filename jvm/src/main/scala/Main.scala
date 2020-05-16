@@ -11,10 +11,10 @@ object Main extends App {
 
   while (true) {
     val move = get_move(size)
-    if (!game.move_is_legal(move.x, move.y)) {
+    if (!game.move_is_legal(move)) {
       println("Move is not legal")
     } else {
-      game.play(move.x, move.y)
+      game.play(move)
       game.display()
     }
   }
