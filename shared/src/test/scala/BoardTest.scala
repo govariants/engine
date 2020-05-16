@@ -88,16 +88,15 @@ class BoardTest extends AnyFunSuite {
       assert(line.split(" ").length == board.size, "Board size is inconsistent")
       for (char <- line.split(' ')) {
         char match {
-          case "+" => board.grid.set(i, j, None)
-          case "X" => board.grid.set(i, j, Some(Black))
-          case "O" => board.grid.set(i, j, Some(White))
+          case "+" =>
+          case "X" => board.add_stone(i, j, Black)
+          case "O" => board.add_stone(i, j, White)
           case _   => assert(false, "Board char not recognized")
         }
         i += 1
       }
       j += 1
     }
-    board.compute_groups_from_scratch()
     board
   }
 }
