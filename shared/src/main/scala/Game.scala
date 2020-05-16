@@ -27,14 +27,14 @@ class Game(val size: Int) {
     compute_playable_action()
   }
 
-  def move_is_legal(x: Int, y: Int): Boolean = {
-    legal_moves.contains(Intersection(x, y))
+  def move_is_legal(intersection: Intersection): Boolean = {
+    legal_moves.contains(intersection)
   }
 
-  def play(x: Int, y: Int): List[String] = {
-    assert(legal_moves.contains(Intersection(x, y)), "move is not playable")
+  def play(intersection: Intersection): List[String] = {
+    assert(legal_moves.contains(intersection), "move is not playable")
 
-    board.add_stone(x, y, turn)
+    board.add_stone(intersection, turn)
 
     switch_turn()
     legal_moves = board.legal_moves(turn)
