@@ -54,9 +54,7 @@ class Board(val size: Int)(implicit grid_builder: GridBuilder) {
   }
 
   def move_would_capture(x: Int, y: Int, color: Color): Boolean = {
-    groups.adjacent_groups(x, y) exists (idx =>
-      groups.color(idx) == color.opposite && groups.liberties(idx) == 1
-    )
+    groups.adjacent(x, y) exists (idx => groups.color(idx) == color.opposite && groups.liberties(idx) == 1)
   }
 
   def add_stone(x: Int, y: Int, color: Color) = {
@@ -73,13 +71,16 @@ class Board(val size: Int)(implicit grid_builder: GridBuilder) {
             if (stone_idx > 0) {
               groups.merge(stone_idx, idx)
             } else {
-              groups.add_to_group(x, y, idx)
+              groups.add(x, y, idx)
               stone_idx = idx
             }
           } else {
             groups.liberties(idx) -= 1
             if (groups.liberties(idx) == 0) {
-              remove_group(idx)
+              for (stone <- groups.members(idx)) {
+                grid.set(stone, None)
+              }
+              groups.remove(idx)
             }
           }
         }
@@ -87,7 +88,7 @@ class Board(val size: Int)(implicit grid_builder: GridBuilder) {
       }
     }
     if (stone_idx == 0) {
-      groups.create_group(x, y, color)
+      groups.create(x, y, color)
     }
   }
 
@@ -115,54 +116,6 @@ class Board(val size: Int)(implicit grid_builder: GridBuilder) {
       neighbors ++= ListBuffer(Intersection(x, y + 1))
     }
     neighbors
-  }
-
-  def remove_group(idx: Idx) = {
-    var adjacent_groups: Set[Idx] = Set()
-    for (intersection <- groups.members(idx)) {
-      grid.set(intersection, None)
-      groups.grid.set(intersection, 0)
-      adjacent_groups ++= groups.adjacent_groups(intersection.x, intersection.y)
-    }
-    for (group <- adjacent_groups) {
-      groups.update_liberties(group)
-    }
-  }
-
-  def compute_groups_from_scratch() = {
-    val visited: Set[Intersection] = Set()
-    for (i <- 0 until size; j <- 0 until size if grid.get(i, j) != None && groups.grid.get(i, j) == 0) {
-      search_connected_stones_recursive(i, j, grid.get(i, j).get, 0, visited)
-    }
-
-    def search_connected_stones_recursive(
-        x: Int,
-        y: Int,
-        color: Color,
-        _idx: Idx,
-        _visited: Set[Intersection]
-    ): Unit = {
-      val visited = _visited + Intersection(x, y)
-      var idx     = _idx
-      if (idx == 0) {
-        groups.create_group(x, y, color)
-        idx = groups.grid.get(x, y)
-      } else {
-        groups.add_to_group(x, y, idx)
-      }
-      for (
-        neighbor <- get_neighbors(x, y)
-          .filter(stone)
-          .filter(stone => same_color(stone, color))
-          .filterNot(visited)
-      ) {
-        search_connected_stones_recursive(neighbor.x, neighbor.y, color, idx, visited)
-      }
-    }
-
-    def same_color(intersection: Intersection, color: Color): Boolean = {
-      grid.get(intersection).get == color
-    }
   }
 
   def score() = {}
