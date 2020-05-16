@@ -15,6 +15,6 @@ jobs:
       - name: Clone repository
         uses: actions/checkout@v2
       - name: Test style convetions
-        run: sbt scalafmtAll
+        run: sbt scalafmtCheckAll
       - name: Run the tests
         run: sbt test
