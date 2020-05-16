@@ -4,27 +4,22 @@ import scala.collection.mutable.HashMap
 import scala.collection.mutable.ListBuffer
 
 import scalajs.js.annotation.{ JSExportAll, JSExportTopLevel }
+import org.govariants.engine.datastructures.GridBuilder
 
 @JSExportAll
 @JSExportTopLevel("StoneGroups")
-class StoneGroups(val size: Int, val board: Board) {
+class StoneGroups(val size: Int, val board: Board)(implicit grid_builder: GridBuilder) {
   type Idx = Int
 
   var idx: Idx                                        = 1
-  var members: HashMap[Idx, ListBuffer[Intersection]] = HashMap()
-  var grid                                            = Array.ofDim[Idx](size, size)
-  var liberties: HashMap[Idx, Int]                    = HashMap()
-  var color: HashMap[Idx, Color]                      = HashMap()
-
-  for (i <- 0 until size) {
-    for (j <- 0 until size) {
-      grid(i)(j) = 0
-    }
-  }
+  val members: HashMap[Idx, ListBuffer[Intersection]] = HashMap()
+  val grid                                            = grid_builder.build[Idx](size, 0)
+  val liberties: HashMap[Idx, Int]                    = HashMap()
+  val color: HashMap[Idx, Color]                      = HashMap()
 
   def create_group(x: Int, y: Int, _color: Color) = {
     members.addOne((idx, ListBuffer(Intersection(x, y))))
-    grid(x)(y) = idx
+    grid.set(x, y, idx)
     liberties.addOne((idx, stone_liberties(x, y).size))
     color.addOne((idx, _color))
     idx += 1
@@ -32,14 +27,14 @@ class StoneGroups(val size: Int, val board: Board) {
 
   def add_to_group(x: Int, y: Int, idx: Idx) = {
     members(idx) ++= ListBuffer(Intersection(x, y))
-    grid(x)(y) = idx
+    grid.set(x, y, idx)
     update_liberties(idx)
   }
 
   def merge(idx1: Idx, idx2: Idx) = {
     members(idx1) ++= members(idx2)
     for (intersection <- members(idx2)) {
-      grid(intersection.x)(intersection.y) = idx1
+      grid.set(intersection, idx1)
     }
     update_liberties(idx1)
   }
@@ -59,8 +54,8 @@ class StoneGroups(val size: Int, val board: Board) {
   def adjacent_groups(x: Int, y: Int): Set[Idx] = {
     board
       .get_neighbors(x, y)
-      .map(intersection => grid(intersection.x)(intersection.y))
-      .filter(idx => idx > 0 && idx != grid(x)(y))
+      .map(intersection => grid.get(intersection))
+      .filter(idx => idx > 0 && idx != grid.get(x, y))
       .toSet
   }
 }

@@ -12,15 +12,9 @@ class Board(val size: Int)(implicit grid_builder: GridBuilder) {
 
   type Idx = Int
 
-  val grid = grid_builder.build(size)
+  val grid = grid_builder.build[Option[Color]](size, None)
 
   val groups: StoneGroups = new StoneGroups(size, this)
-
-  for (i <- 0 until size) {
-    for (j <- 0 until size) {
-      grid.set(i, j, None)
-    }
-  }
 
   override def toString(): String = {
     val string = new StringBuilder("  ")
@@ -105,7 +99,7 @@ class Board(val size: Int)(implicit grid_builder: GridBuilder) {
   }
 
   def stone_idx_and_color(intersection: Intersection): (Idx, Color) = {
-    val idx = groups.grid(intersection.x)(intersection.y)
+    val idx = groups.grid.get(intersection)
     (idx, groups.color(idx))
   }
 
@@ -130,7 +124,7 @@ class Board(val size: Int)(implicit grid_builder: GridBuilder) {
     var adjacent_groups: Set[Idx] = Set()
     for (intersection <- groups.members(idx)) {
       grid.set(intersection, None)
-      groups.grid(intersection.x)(intersection.y) = 0
+      groups.grid.set(intersection, 0)
       adjacent_groups ++= groups.adjacent_groups(intersection.x, intersection.y)
     }
     for (group <- adjacent_groups) {
@@ -140,7 +134,7 @@ class Board(val size: Int)(implicit grid_builder: GridBuilder) {
 
   def compute_groups_from_scratch() = {
     var visited: Set[Intersection] = Set()
-    for (i <- 0 until size; j <- 0 until size if grid.get(i, j) != None && groups.grid(i)(j) == 0) {
+    for (i <- 0 until size; j <- 0 until size if grid.get(i, j) != None && groups.grid.get(i, j) == 0) {
       search_connected_stones_recursive(i, j, grid.get(i, j).get, 0, visited)
     }
 
@@ -155,7 +149,7 @@ class Board(val size: Int)(implicit grid_builder: GridBuilder) {
       var idx     = _idx
       if (idx == 0) {
         groups.create_group(x, y, color)
-        idx = groups.grid(x)(y)
+        idx = groups.grid.get(x, y)
       } else {
         groups.add_to_group(x, y, idx)
       }

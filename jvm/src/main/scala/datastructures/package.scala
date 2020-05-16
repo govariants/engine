@@ -2,6 +2,6 @@ package org.govariants.engine
 
 package object datastructures {
   implicit object ScalaGridBuilder extends GridBuilder {
-    def build(size: Int): ScalaGrid = new ScalaGrid(size)
+    def build[T](size: Int, initial_value: T): ScalaGrid[T] = new ScalaGrid[T](size, initial_value)
   }
 }
