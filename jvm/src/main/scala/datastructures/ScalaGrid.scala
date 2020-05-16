@@ -1,13 +1,20 @@
 package org.govariants.engine;
 package datastructures;
 
-class ScalaGrid(size: Int) extends Grid(size) {
-  private val grid = Array.ofDim[Option[Color]](size, size)
+import collection.mutable.ArrayBuffer
 
-  def get(x: Int, y: Int): Option[Color]             = grid(x)(y)
-  def get(intersection: Intersection): Option[Color] = grid(intersection.x)(intersection.y)
+class ScalaGrid[T](size: Int, initial_value: T) extends Grid[T](size, initial_value) {
+  private val grid = new ArrayBuffer[ArrayBuffer[T]]()
+  for (i <- 0 until size) {
+    val row = new ArrayBuffer[T]()
+    row.padToInPlace(size, initial_value)
+    grid.append(row)
+  }
 
-  def set(x: Int, y: Int, color: Option[Color]): Unit = grid(x)(y) = color
-  def set(intersection: Intersection, color: Option[Color]): Unit =
-    grid(intersection.x)(intersection.y) = color
+  def get(x: Int, y: Int): T             = grid(x)(y)
+  def get(intersection: Intersection): T = grid(intersection.x)(intersection.y)
+
+  def set(x: Int, y: Int, item: T): Unit = grid(x)(y) = item
+  def set(intersection: Intersection, item: T): Unit =
+    grid(intersection.x)(intersection.y) = item
 }
