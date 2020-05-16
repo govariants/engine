@@ -40,7 +40,7 @@ class Board(val size: Int)(implicit grid_builder: GridBuilder) {
   }
 
   def legal_moves(color: Color): ListBuffer[Intersection] = {
-    var _legal_moves: ListBuffer[Intersection] = ListBuffer()
+    val _legal_moves: ListBuffer[Intersection] = ListBuffer()
     for (i <- 0 until size; j <- 0 until size if grid.get(i, j) == None) {
       if (groups.stone_liberties(i, j).size == 0) {
         if (move_would_capture(i, j, color)) {
@@ -54,12 +54,9 @@ class Board(val size: Int)(implicit grid_builder: GridBuilder) {
   }
 
   def move_would_capture(x: Int, y: Int, color: Color): Boolean = {
-    for (adjacent_group <- groups.adjacent_groups(x, y)) {
-      if (groups.color(adjacent_group) == color.opposite && groups.liberties(adjacent_group) == 1) {
-        return true
-      }
-    }
-    false
+    groups.adjacent_groups(x, y) exists (idx =>
+      groups.color(idx) == color.opposite && groups.liberties(idx) == 1
+    )
   }
 
   def add_stone(x: Int, y: Int, color: Color) = {
@@ -68,7 +65,7 @@ class Board(val size: Int)(implicit grid_builder: GridBuilder) {
     var stone_idx: Idx                      = 0
 
     if (neighbors.length > 0) {
-      var idx_processed: ListBuffer[Idx] = ListBuffer()
+      val idx_processed: ListBuffer[Idx] = ListBuffer()
       for (neighbor <- neighbors) {
         val (idx, _color) = stone_idx_and_color(neighbor)
         if (!idx_processed.contains(idx)) {
@@ -133,7 +130,7 @@ class Board(val size: Int)(implicit grid_builder: GridBuilder) {
   }
 
   def compute_groups_from_scratch() = {
-    var visited: Set[Intersection] = Set()
+    val visited: Set[Intersection] = Set()
     for (i <- 0 until size; j <- 0 until size if grid.get(i, j) != None && groups.grid.get(i, j) == 0) {
       search_connected_stones_recursive(i, j, grid.get(i, j).get, 0, visited)
     }
@@ -144,8 +141,8 @@ class Board(val size: Int)(implicit grid_builder: GridBuilder) {
         color: Color,
         _idx: Idx,
         _visited: Set[Intersection]
-    ) {
-      var visited = _visited + Intersection(x, y)
+    ): Unit = {
+      val visited = _visited + Intersection(x, y)
       var idx     = _idx
       if (idx == 0) {
         groups.create_group(x, y, color)
