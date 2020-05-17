@@ -65,7 +65,7 @@ class Board(val size: Int)(implicit grid_builder: GridBuilder) {
   def position_repeat(intersection: Intersection, color: Color): Boolean = {
     val tmp_grid = grid.copy()
     add_stone_virtual(tmp_grid, intersection, color)
-    tmp_grid == previous_grid
+    tmp_grid.same_grid(previous_grid)
   }
 
   def add_stone_virtual(virtual_grid: Grid[Option[Color]], intersection: Intersection, color: Color) = {
