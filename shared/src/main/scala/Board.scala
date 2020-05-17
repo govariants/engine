@@ -13,7 +13,7 @@ class Board(val size: Int)(implicit grid_builder: GridBuilder) {
 
   type Idx = Int
 
-  val grid          = grid_builder.build[Option[Color]](size, None)
+  val grid = grid_builder.build[Option[Color]](size, None)
   val previous_grid = grid_builder.build[Option[Color]](size, None)
 
   val groups: StoneGroups = new StoneGroups(size, this)
@@ -90,7 +90,7 @@ class Board(val size: Int)(implicit grid_builder: GridBuilder) {
     previous_grid.copy_from(grid)
     grid.set(intersection, Some(color))
     val neighbors: ListBuffer[Intersection] = get_neighbors(intersection).filter(is_stone)
-    var stone_idx: Idx                      = 0
+    var stone_idx: Idx = 0
 
     if (neighbors.length > 0) {
       val idx_processed: ListBuffer[Idx] = ListBuffer()
@@ -152,11 +152,11 @@ class Board(val size: Int)(implicit grid_builder: GridBuilder) {
       dead_stones: ListBuffer[Intersection]
   ): (ListBuffer[Intersection], ListBuffer[Intersection]) = {
     val grid_without_dead_stone = this.grid.copy()
-    val visited                 = grid_builder.build[Boolean](size, false)
-    val black_territory         = new ListBuffer[Intersection]
-    val white_territory         = new ListBuffer[Intersection]
-    var black_border            = false
-    var white_border            = false
+    val visited = grid_builder.build[Boolean](size, false)
+    val black_territory = new ListBuffer[Intersection]
+    val white_territory = new ListBuffer[Intersection]
+    var black_border = false
+    var white_border = false
 
     for (dead_stone <- dead_stones) {
       val dead_stone_idx = groups.indexes.get(dead_stone)

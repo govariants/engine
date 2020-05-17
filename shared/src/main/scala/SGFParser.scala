@@ -5,7 +5,7 @@ import scalajs.js.annotation.{ JSExportAll, JSExportTopLevel }
 @JSExportAll
 @JSExportTopLevel("SGFParser")
 class SGFParser(val sgf_string: String) {
-  val move_regex       = """;(W|B)\[([a-z])([a-z])\]""".r
+  val move_regex = """;(W|B)\[([a-z])([a-z])\]""".r
   val board_size_regex = """SZ\[(\d{1,2}|\d{1,2}:\d{1,2})\]""".r
 
   def build_board(): Board = {

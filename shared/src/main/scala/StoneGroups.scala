@@ -11,11 +11,11 @@ import org.govariants.engine.datastructures.GridBuilder
 class StoneGroups(val size: Int, val board: Board)(implicit grid_builder: GridBuilder) {
   type Idx = Int
 
-  var idx_counter: Idx                                = 1
+  var idx_counter: Idx = 1
   val members: HashMap[Idx, ListBuffer[Intersection]] = HashMap()
-  val indexes                                         = grid_builder.build[Idx](size, 0)
-  val liberties_count: HashMap[Idx, Int]              = HashMap()
-  val color: HashMap[Idx, Color]                      = HashMap()
+  val indexes = grid_builder.build[Idx](size, 0)
+  val liberties_count: HashMap[Idx, Int] = HashMap()
+  val color: HashMap[Idx, Color] = HashMap()
 
   def create(intersection: Intersection, color: Color) = {
     members += ((idx_counter, ListBuffer(intersection)))
