@@ -62,10 +62,7 @@ class BoardTest extends AnyFunSuite {
   }
 
   test("Full 9x9 game") {
-    val sgf_string = sgfs.SGF1.content
-    val sgf_parser: SGFParser = new SGFParser(sgf_string)
-
-    val board = sgf_parser.build_board()
+    val board = board_from_sgf(sgfs.SGF1.content)
 
     val target_board_str = """|+ + + + O O X + +
                               |+ + O + O X X X +
@@ -82,10 +79,7 @@ class BoardTest extends AnyFunSuite {
   }
 
   test("Compute score of full 9x9 game") {
-    val sgf_string = sgfs.SGF1.content
-    val sgf_parser: SGFParser = new SGFParser(sgf_string)
-
-    val board = sgf_parser.build_board()
+    val board = board_from_sgf(sgfs.SGF1.content)
     val dead_stones =
       ListBuffer(Intersection(5, 7), Intersection(6, 6), Intersection(7, 7), Intersection(6, 8))
     println(board.score(7, dead_stones))
@@ -129,6 +123,12 @@ class BoardTest extends AnyFunSuite {
 
     println(board_1.toString)
     assert(board_1.legal_moves(White).ko == Set(Intersection(5, 2), Intersection(5, 4)))
+  }
+
+  def board_from_sgf(sgf_string: String): Board = {
+    val parse_result = SGFParser.parse_sgf_string(sgf_string)
+    if (parse_result.isFailure) fail()
+    parse_result.get(0).main_line_to_board
   }
 
   def board_from_string(board_str: String): Board = {
