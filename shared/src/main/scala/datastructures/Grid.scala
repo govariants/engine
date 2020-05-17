@@ -7,6 +7,11 @@ abstract class Grid[T](size: Int, initial_value: T) {
 
   def set(x: Int, y: Int, item: T): Unit
   def set(intersection: Intersection, item: T): Unit
+
+  def copy(): Grid[T]
+  def copy_from(grid: Grid[T]): Unit
+
+  override def equals(that: Any): Boolean
 }
 
 abstract class GridBuilder {

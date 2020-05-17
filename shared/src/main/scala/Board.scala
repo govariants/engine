@@ -4,6 +4,7 @@ import scala.collection.mutable.ListBuffer
 
 import scalajs.js.annotation.{ JSExportAll, JSExportTopLevel }
 import org.govariants.engine.datastructures.GridBuilder
+import org.govariants.engine.datastructures.Grid
 
 @JSExportAll
 @JSExportTopLevel("Board")
@@ -12,7 +13,8 @@ class Board(val size: Int)(implicit grid_builder: GridBuilder) {
 
   type Idx = Int
 
-  val grid = grid_builder.build[Option[Color]](size, None)
+  val grid          = grid_builder.build[Option[Color]](size, None)
+  val previous_grid = grid_builder.build[Option[Color]](size, None)
 
   val groups: StoneGroups = new StoneGroups(size, this)
 
@@ -42,12 +44,13 @@ class Board(val size: Int)(implicit grid_builder: GridBuilder) {
   def legal_moves(color: Color): ListBuffer[Intersection] = {
     val _legal_moves: ListBuffer[Intersection] = ListBuffer()
     for (i <- 0 until size; j <- 0 until size if grid.get(i, j) == None) {
-      if (groups.stone_liberties(Intersection(i, j)).size == 0) {
-        if (move_would_capture(Intersection(i, j), color)) {
-          _legal_moves.append(Intersection(i, j))
+      val intersection = Intersection(i, j)
+      if (groups.stone_liberties(intersection).size == 0) {
+        if (move_would_capture(intersection, color) && !position_repeat(intersection, color)) {
+          _legal_moves.append(intersection)
         }
       } else {
-        _legal_moves.append(Intersection(i, j))
+        _legal_moves.append(intersection)
       }
     }
     _legal_moves
@@ -59,7 +62,32 @@ class Board(val size: Int)(implicit grid_builder: GridBuilder) {
     )
   }
 
+  def position_repeat(intersection: Intersection, color: Color): Boolean = {
+    val tmp_grid = grid.copy()
+    add_stone_virtual(tmp_grid, intersection, color)
+    tmp_grid == previous_grid
+  }
+
+  def add_stone_virtual(virtual_grid: Grid[Option[Color]], intersection: Intersection, color: Color) = {
+    virtual_grid.set(intersection, Some(color))
+    val neighbors: ListBuffer[Intersection] = get_neighbors(intersection).filter(is_stone)
+
+    if (neighbors.length > 0) {
+      val idx_processed: ListBuffer[Idx] = ListBuffer()
+      for (neighbor <- neighbors) {
+        val (idx, _color) = stone_idx_and_color(neighbor)
+        if (!idx_processed.contains(idx) && _color != color && groups.liberties_count(idx) == 1) {
+          for (stone <- groups.members(idx)) {
+            virtual_grid.set(stone, None)
+          }
+        }
+        idx_processed ++= ListBuffer(idx)
+      }
+    }
+  }
+
   def add_stone(intersection: Intersection, color: Color) = {
+    previous_grid.copy_from(grid)
     grid.set(intersection, Some(color))
     val neighbors: ListBuffer[Intersection] = get_neighbors(intersection).filter(is_stone)
     var stone_idx: Idx                      = 0

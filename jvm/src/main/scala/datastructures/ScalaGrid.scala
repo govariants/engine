@@ -17,4 +17,31 @@ class ScalaGrid[T](size: Int, initial_value: T) extends Grid[T](size, initial_va
   def set(x: Int, y: Int, item: T): Unit = grid(x)(y) = item
   def set(intersection: Intersection, item: T): Unit =
     grid(intersection.x)(intersection.y) = item
+
+  def copy(): ScalaGrid[T] = {
+    val copied_grid = ScalaGridBuilder.build[T](size, initial_value)
+    for (i <- 0 until size; j <- 0 until size) {
+      copied_grid.set(i, j, grid(i)(j))
+    }
+    copied_grid
+  }
+
+  def copy_from(grid: Grid[T]): Unit = {
+    for (i <- 0 until size; j <- 0 until size) {
+      this.grid(i)(j) = grid.get(i, j)
+    }
+  }
+
+  override def equals(that: Any): Boolean = {
+    that match {
+      case grid: Grid[T] => {
+        var grid_are_equal = true
+        for (i <- 0 until size; j <- 0 until size) {
+          grid_are_equal = grid_are_equal && (this.grid(i)(j) == grid.get(i, j))
+        }
+        grid_are_equal
+      }
+      case _ => false
+    }
+  }
 }
