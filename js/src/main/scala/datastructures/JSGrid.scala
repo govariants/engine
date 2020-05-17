@@ -9,7 +9,7 @@ import scalajs.js.annotation.{ JSExportAll, JSExportTopLevel }
 class JSGrid[T](size: Int, initial_value: T) extends Grid[T](size, initial_value) {
 
   protected val grid_builder = JSGridBuilder
-  val grid                   = new ScalaJSArray[ScalaJSArray[T]]()
+  val grid = new ScalaJSArray[ScalaJSArray[T]]()
 
   for (i <- 0 until size) {
     val row = new ScalaJSArray[T]()
@@ -17,7 +17,7 @@ class JSGrid[T](size: Int, initial_value: T) extends Grid[T](size, initial_value
     grid.append(row)
   }
 
-  def get(x: Int, y: Int): T             = grid(x)(y)
+  def get(x: Int, y: Int): T = grid(x)(y)
   def get(intersection: Intersection): T = grid(intersection.x)(intersection.y)
 
   def set(x: Int, y: Int, item: T): Unit = grid(x)(y) = item

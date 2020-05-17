@@ -13,7 +13,7 @@ class Board(val size: Int)(implicit grid_builder: GridBuilder) {
 
   type Idx = Int
 
-  val grid          = grid_builder.build[Option[Color]](size, None)
+  val grid = grid_builder.build[Option[Color]](size, None)
   val previous_grid = grid_builder.build[Option[Color]](size, None)
 
   val groups: StoneGroups = new StoneGroups(size, this)
@@ -90,7 +90,7 @@ class Board(val size: Int)(implicit grid_builder: GridBuilder) {
     previous_grid.copy_from(grid)
     grid.set(intersection, Some(color))
     val neighbors: ListBuffer[Intersection] = get_neighbors(intersection).filter(is_stone)
-    var stone_idx: Idx                      = 0
+    var stone_idx: Idx = 0
 
     if (neighbors.length > 0) {
       val idx_processed: ListBuffer[Idx] = ListBuffer()
@@ -148,5 +148,64 @@ class Board(val size: Int)(implicit grid_builder: GridBuilder) {
     neighbors
   }
 
-  def score() = {}
+  def compute_territories(
+      dead_stones: ListBuffer[Intersection]
+  ): (ListBuffer[Intersection], ListBuffer[Intersection]) = {
+    val grid_without_dead_stone = this.grid.copy()
+    val visited = grid_builder.build[Boolean](size, false)
+    val black_territory = new ListBuffer[Intersection]
+    val white_territory = new ListBuffer[Intersection]
+    var black_border = false
+    var white_border = false
+
+    for (dead_stone <- dead_stones) {
+      val dead_stone_idx = groups.indexes.get(dead_stone)
+      for (stone <- groups.members(dead_stone_idx)) {
+        grid_without_dead_stone.set(stone, None)
+      }
+    }
+
+    for (i <- 0 until size; j <- 0 until size if visited.get(i, j) == false) {
+      val intersection = Intersection(i, j)
+      visited.set(intersection, true)
+      black_border = false
+      white_border = false
+      grid_without_dead_stone.get(i, j) match {
+        case Some(Black) => black_territory += intersection
+        case Some(White) => white_territory += intersection
+        case None => {
+          val territory = new ListBuffer[Intersection]
+          recursive_compute_territories(intersection, territory)
+          if (black_border && !white_border) black_territory ++= territory
+          if (white_border && !black_border) white_territory ++= territory
+        }
+      }
+    }
+
+    def recursive_compute_territories(
+        intersection: Intersection,
+        territory: ListBuffer[Intersection]
+    ): Unit = {
+      visited.set(intersection, true)
+      territory += intersection
+      for (neighbor <- get_neighbors(intersection)) {
+        if (grid_without_dead_stone.get(neighbor).isDefined) {
+          grid.get(neighbor) match {
+            case Some(Black) => black_border = true
+            case Some(White) => white_border = true
+            case None        =>
+          }
+        } else if (!visited.get(neighbor)) {
+          recursive_compute_territories(neighbor, territory)
+        }
+      }
+    }
+
+    (black_territory, white_territory)
+  }
+
+  def score(komi: Int, dead_stones: ListBuffer[Intersection]): (Int, Int) = {
+    val (black_territory, white_territory) = compute_territories(dead_stones)
+    (black_territory.size, white_territory.size + komi)
+  }
 }

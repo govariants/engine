@@ -43,7 +43,7 @@ class Game(val size: Int) {
   }
 
   def compute_score() = {
-    board.score()
+    //board.score()
   }
 
   def switch_turn() = {

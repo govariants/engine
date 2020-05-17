@@ -24,7 +24,7 @@ object Main extends App {
     var y: Int = 0
 
     do {
-      val move    = readLine("Move ?")
+      val move = readLine("Move ?")
       val scanner = new Scanner(move).useDelimiter("")
       x = scanner.next().charAt(0) - 'a'
       y = scanner.nextInt() - 1
