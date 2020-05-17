@@ -80,6 +80,23 @@ class BoardTest extends AnyFunSuite {
     assert(board.toString == target_board.toString())
   }
 
+  test("Simple Ko is forbidden") {
+    val board_1_str = """+ + + + X X X + +
+                        |+ X + X O O O X +
+                        |+ + X + + X O X +
+                        |+ + O + + + + + +
+                        |+ + X X O X + + +
+                        |+ + X O + O + + +
+                        |+ + + X O + + + +
+                        |+ + + + + + + + +
+                        |+ + + + + + + + +""".stripMargin
+    val board_1     = board_from_string(board_1_str)
+
+    board_1.add_stone(Intersection(4, 5), Black)
+
+    assert(!board_1.legal_moves(White).contains(Intersection(3, 5)))
+  }
+
   def board_from_string(board_str: String): Board = {
     val board = new Board(board_str.split('\n').length)
     var j     = 0
