@@ -1,6 +1,7 @@
 package org.govariants.engine
 
 import org.scalatest.funsuite.AnyFunSuite
+import scala.collection.mutable.ListBuffer
 
 class BoardTest extends AnyFunSuite {
 
@@ -78,6 +79,16 @@ class BoardTest extends AnyFunSuite {
     val target_board     = board_from_string(target_board_str)
 
     assert(board.toString == target_board.toString())
+  }
+
+  test("Compute score of full 9x9 game") {
+    val sgf_string            = sgfs.SGF1.content
+    val sgf_parser: SGFParser = new SGFParser(sgf_string)
+
+    val board = sgf_parser.build_board()
+    val dead_stones = ListBuffer(Intersection(5, 7), Intersection(6, 6), Intersection(7, 7), Intersection(6, 8))
+    println(board.score(7, dead_stones))
+    assert(board.score(7, dead_stones) == ((43, 45)))
   }
 
   test("Simple Ko is forbidden") {
