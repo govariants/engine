@@ -41,19 +41,25 @@ class Board(val size: Int)(implicit grid_builder: GridBuilder) {
     string.toString
   }
 
-  def legal_moves(color: Color): ListBuffer[Intersection] = {
-    val _legal_moves: ListBuffer[Intersection] = ListBuffer()
+  def legal_moves(color: Color): LegalMoves = {
+    var legal_moves_list: List[Intersection] = List()
+    var ko_moves_list: List[Intersection] = List()
+
     for (i <- 0 until size; j <- 0 until size if grid.get(i, j) == None) {
       val intersection = Intersection(i, j)
-      if (groups.stone_liberties(intersection).size == 0) {
-        if (move_would_capture(intersection, color) && !position_repeat(intersection, color)) {
-          _legal_moves.append(intersection)
-        }
+      if (position_repeat(intersection, color)) {
+        ko_moves_list = ko_moves_list :+ intersection
       } else {
-        _legal_moves.append(intersection)
+        if (groups.stone_liberties(intersection).size == 0) {
+          if (move_would_capture(intersection, color)) {
+            legal_moves_list = legal_moves_list :+ intersection
+          }
+        } else {
+          legal_moves_list = legal_moves_list :+ intersection
+        }
       }
     }
-    _legal_moves
+    LegalMoves(legal_moves_list, ko_moves_list)
   }
 
   def move_would_capture(intersection: Intersection, color: Color): Boolean = {
