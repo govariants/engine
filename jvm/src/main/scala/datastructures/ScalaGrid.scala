@@ -3,14 +3,14 @@ package datastructures;
 
 import collection.mutable.ArrayBuffer
 
-class ScalaGrid[T](size: Int, initial_value: T) extends Grid[T](size, initial_value) {
+class ScalaGrid[T](grid_size: Int, initial_value: T) extends Grid[T](grid_size, initial_value) {
 
   protected val grid_builder = ScalaGridBuilder
   private val grid = new ArrayBuffer[ArrayBuffer[T]]()
 
-  for (i <- 0 until size) {
+  for (i <- 0 until grid_size) {
     val row = new ArrayBuffer[T]()
-    row.padToInPlace(size, initial_value)
+    row.padToInPlace(grid_size, initial_value)
     grid.append(row)
   }
 
@@ -23,5 +23,5 @@ class ScalaGrid[T](size: Int, initial_value: T) extends Grid[T](size, initial_va
 }
 
 object ScalaGridBuilder extends GridBuilder {
-  def build[T](size: Int, initial_value: T): ScalaGrid[T] = new ScalaGrid[T](size, initial_value)
+  def build[T](grid_size: Int, initial_value: T): ScalaGrid[T] = new ScalaGrid[T](grid_size, initial_value)
 }

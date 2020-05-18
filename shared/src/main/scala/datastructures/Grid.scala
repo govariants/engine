@@ -1,7 +1,7 @@
 package org.govariants.engine
 package datastructures
 
-abstract class Grid[T](val size: Int, val initial_value: T) {
+abstract class Grid[T](val grid_size: Int, val initial_value: T) extends Iterable[(Intersection, T)] {
 
   protected val grid_builder: GridBuilder
 
@@ -11,26 +11,22 @@ abstract class Grid[T](val size: Int, val initial_value: T) {
   def set(x: Int, y: Int, item: T): Unit
   def set(intersection: Intersection, item: T): Unit
 
+  def iterator =
+    for (i <- Iterator.range(0, grid_size); j <- Iterator.range(0, grid_size))
+      yield (Intersection(i, j), get(i, j))
+
   def copy(): Grid[T] = {
-    val grid_copy = grid_builder.build(size, initial_value)
-    for (i <- 0 until size; j <- 0 until size) {
-      grid_copy.set(i, j, get(i, j))
-    }
+    val grid_copy = grid_builder.build(grid_size, initial_value)
+    iterator.foreach(t => grid_copy.set(t._1, t._2))
     grid_copy
   }
 
   def copy_from(grid: Grid[T]): Unit = {
-    for (i <- 0 until size; j <- 0 until size) {
-      set(i, j, grid.get(i, j))
-    }
+    grid.iterator.foreach(t => set(t._1, t._2))
   }
 
   def same_grid(other_grid: Grid[T]): Boolean = {
-    var result = true
-    for (i <- 0 until size; j <- 0 until size) {
-      result &&= get(i, j) == other_grid.get(i, j)
-    }
-    result
+    !zip(other_grid).exists(tt => tt._1._2 != tt._2._2)
   }
 }
 
