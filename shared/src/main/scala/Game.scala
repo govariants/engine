@@ -1,7 +1,5 @@
 package org.govariants.engine
 
-import scala.collection.mutable.ListBuffer
-
 import scalajs.js.annotation.{ JSExportAll, JSExportTopLevel }
 
 @JSExportAll
@@ -10,7 +8,7 @@ class Game(val size: Int) {
 
   var turn: Color = Black
 
-  var legal_moves: ListBuffer[Intersection] = ListBuffer()
+  var legal_moves = LegalMoves()
 
   val board = new Board(size)
 
@@ -28,11 +26,11 @@ class Game(val size: Int) {
   }
 
   def move_is_legal(intersection: Intersection): Boolean = {
-    legal_moves.contains(intersection)
+    legal_moves.legal.contains(intersection)
   }
 
   def play(intersection: Intersection): List[String] = {
-    assert(legal_moves.contains(intersection), "move is not playable")
+    assert(legal_moves.legal.contains(intersection), "move is not playable")
 
     board.add_stone(intersection, turn)
 

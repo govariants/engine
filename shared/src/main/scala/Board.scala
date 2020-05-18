@@ -14,7 +14,7 @@ class Board(val size: Int)(implicit grid_builder: GridBuilder) {
   type Idx = Int
 
   val grid = grid_builder.build[Option[Color]](size, None)
-  val previous_grid = grid_builder.build[Option[Color]](size, None)
+  val zobrist_hashes = new ZobristHashes(size)
 
   val groups: StoneGroups = new StoneGroups(size, this)
 
@@ -41,19 +41,23 @@ class Board(val size: Int)(implicit grid_builder: GridBuilder) {
     string.toString
   }
 
-  def legal_moves(color: Color): ListBuffer[Intersection] = {
-    val _legal_moves: ListBuffer[Intersection] = ListBuffer()
-    for (i <- 0 until size; j <- 0 until size if grid.get(i, j) == None) {
-      val intersection = Intersection(i, j)
-      if (groups.stone_liberties(intersection).size == 0) {
-        if (move_would_capture(intersection, color) && !position_repeat(intersection, color)) {
-          _legal_moves.append(intersection)
-        }
-      } else {
-        _legal_moves.append(intersection)
+  def legal_moves(color: Color): LegalMoves = {
+    def intersection_playability(intersection: Intersection): PlayabilityType =
+      if (position_repeat(intersection, color))
+        Ko
+      else if (groups.stone_liberties(intersection).size > 0 || move_would_capture(intersection, color))
+        Legal
+      else
+        Illegal
+
+    (for (i <- 0 until size; j <- 0 until size if grid.get(i, j) == None)
+      yield Intersection(i, j)).foldLeft(LegalMoves())((legal_moves, intersection) =>
+      intersection_playability(intersection) match {
+        case Ko      => LegalMoves(legal_moves.legal, legal_moves.ko + intersection)
+        case Legal   => LegalMoves(legal_moves.legal + intersection, legal_moves.ko)
+        case Illegal => legal_moves
       }
-    }
-    _legal_moves
+    )
   }
 
   def move_would_capture(intersection: Intersection, color: Color): Boolean = {
@@ -65,7 +69,7 @@ class Board(val size: Int)(implicit grid_builder: GridBuilder) {
   def position_repeat(intersection: Intersection, color: Color): Boolean = {
     val tmp_grid = grid.copy()
     add_stone_virtual(tmp_grid, intersection, color)
-    tmp_grid.same_grid(previous_grid)
+    zobrist_hashes.position_repeat(tmp_grid)
   }
 
   def add_stone_virtual(virtual_grid: Grid[Option[Color]], intersection: Intersection, color: Color) = {
@@ -87,7 +91,6 @@ class Board(val size: Int)(implicit grid_builder: GridBuilder) {
   }
 
   def add_stone(intersection: Intersection, color: Color) = {
-    previous_grid.copy_from(grid)
     grid.set(intersection, Some(color))
     val neighbors: ListBuffer[Intersection] = get_neighbors(intersection).filter(is_stone)
     var stone_idx: Idx = 0
@@ -120,6 +123,7 @@ class Board(val size: Int)(implicit grid_builder: GridBuilder) {
     if (stone_idx == 0) {
       groups.create(intersection, color)
     }
+    zobrist_hashes.add_position(grid)
   }
 
   def is_stone(intersection: Intersection): Boolean = {

@@ -106,7 +106,29 @@ class BoardTest extends AnyFunSuite {
 
     board_1.add_stone(Intersection(4, 5), Black)
 
-    assert(!board_1.legal_moves(White).contains(Intersection(3, 5)))
+    assert(board_1.legal_moves(White).ko == Set(Intersection(3, 5)))
+  }
+
+  test("Triple Ko is forbidden") {
+    val board_1_str = """+ + X O + O X O +
+                        |+ + X O O X X O +
+                        |+ + X O X + X O +
+                        |+ + X O O X X O +
+                        |+ + X O + O X O +
+                        |+ + X O O X X O +
+                        |+ + X X X O O O +
+                        |+ + + + + + + + +
+                        |+ + + + + + + + +""".stripMargin
+    val board_1 = board_from_string(board_1_str)
+
+    board_1.add_stone(Intersection(4, 0), Black)
+    board_1.add_stone(Intersection(5, 2), White)
+    board_1.add_stone(Intersection(4, 4), Black)
+    board_1.add_stone(Intersection(5, 0), White)
+    board_1.add_stone(Intersection(4, 2), Black)
+
+    println(board_1.toString)
+    assert(board_1.legal_moves(White).ko == Set(Intersection(5, 2), Intersection(5, 4)))
   }
 
   def board_from_string(board_str: String): Board = {
