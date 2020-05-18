@@ -6,14 +6,14 @@ import scalajs.js.annotation.{ JSExportAll, JSExportTopLevel }
 
 @JSExportAll
 @JSExportTopLevel("JSGrid")
-class JSGrid[T](size: Int, initial_value: T) extends Grid[T](size, initial_value) {
+class JSGrid[T](grid_size: Int, initial_value: T) extends Grid[T](grid_size, initial_value) {
 
   protected val grid_builder = JSGridBuilder
   val grid = new ScalaJSArray[ScalaJSArray[T]]()
 
-  for (i <- 0 until size) {
+  for (i <- 0 until grid_size) {
     val row = new ScalaJSArray[T]()
-    row.padToInPlace(size, initial_value)
+    row.padToInPlace(grid_size, initial_value)
     grid.append(row)
   }
 
@@ -26,5 +26,5 @@ class JSGrid[T](size: Int, initial_value: T) extends Grid[T](size, initial_value
 }
 
 object JSGridBuilder extends GridBuilder {
-  def build[T](size: Int, initial_value: T): JSGrid[T] = new JSGrid(size, initial_value)
+  def build[T](grid_size: Int, initial_value: T): JSGrid[T] = new JSGrid(grid_size, initial_value)
 }

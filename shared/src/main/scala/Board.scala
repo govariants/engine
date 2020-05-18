@@ -50,14 +50,16 @@ class Board(val size: Int)(implicit grid_builder: GridBuilder) {
       else
         Illegal
 
-    (for (i <- 0 until size; j <- 0 until size if grid.get(i, j) == None)
-      yield Intersection(i, j)).foldLeft(LegalMoves())((legal_moves, intersection) =>
-      intersection_playability(intersection) match {
-        case Ko      => LegalMoves(legal_moves.legal, legal_moves.ko + intersection)
-        case Legal   => LegalMoves(legal_moves.legal + intersection, legal_moves.ko)
-        case Illegal => legal_moves
-      }
-    )
+    grid
+      .filter(_._2.isEmpty)
+      .map(_._1)
+      .foldLeft(LegalMoves())((legal_moves, intersection) =>
+        intersection_playability(intersection) match {
+          case Ko      => LegalMoves(legal_moves.legal, legal_moves.ko + intersection)
+          case Legal   => LegalMoves(legal_moves.legal + intersection, legal_moves.ko)
+          case Illegal => legal_moves
+        }
+      )
   }
 
   def move_would_capture(intersection: Intersection, color: Color): Boolean = {
