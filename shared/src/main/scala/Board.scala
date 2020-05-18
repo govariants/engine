@@ -14,7 +14,7 @@ class Board(val size: Int)(implicit grid_builder: GridBuilder) {
   type Idx = Int
 
   val grid = grid_builder.build[Option[Color]](size, None)
-  val previous_grid = grid_builder.build[Option[Color]](size, None)
+  val zobrist_hashes = new ZobristHashes(size)
 
   val groups: StoneGroups = new StoneGroups(size, this)
 
@@ -65,7 +65,7 @@ class Board(val size: Int)(implicit grid_builder: GridBuilder) {
   def position_repeat(intersection: Intersection, color: Color): Boolean = {
     val tmp_grid = grid.copy()
     add_stone_virtual(tmp_grid, intersection, color)
-    tmp_grid.same_grid(previous_grid)
+    zobrist_hashes.position_repeat(tmp_grid)
   }
 
   def add_stone_virtual(virtual_grid: Grid[Option[Color]], intersection: Intersection, color: Color) = {
@@ -87,7 +87,6 @@ class Board(val size: Int)(implicit grid_builder: GridBuilder) {
   }
 
   def add_stone(intersection: Intersection, color: Color) = {
-    previous_grid.copy_from(grid)
     grid.set(intersection, Some(color))
     val neighbors: ListBuffer[Intersection] = get_neighbors(intersection).filter(is_stone)
     var stone_idx: Idx = 0
@@ -120,6 +119,7 @@ class Board(val size: Int)(implicit grid_builder: GridBuilder) {
     if (stone_idx == 0) {
       groups.create(intersection, color)
     }
+    zobrist_hashes.add_position(grid)
   }
 
   def is_stone(intersection: Intersection): Boolean = {
