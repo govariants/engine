@@ -42,24 +42,22 @@ class Board(val size: Int)(implicit grid_builder: GridBuilder) {
   }
 
   def legal_moves(color: Color): LegalMoves = {
-    var legal_moves_list: List[Intersection] = List()
-    var ko_moves_list: List[Intersection] = List()
+    def intersection_playability(intersection: Intersection): PlayabilityType =
+      if (position_repeat(intersection, color))
+        Ko
+      else if (groups.stone_liberties(intersection).size > 0 || move_would_capture(intersection, color))
+        Legal
+      else
+        Illegal
 
-    for (i <- 0 until size; j <- 0 until size if grid.get(i, j) == None) {
-      val intersection = Intersection(i, j)
-      if (position_repeat(intersection, color)) {
-        ko_moves_list = ko_moves_list :+ intersection
-      } else {
-        if (groups.stone_liberties(intersection).size == 0) {
-          if (move_would_capture(intersection, color)) {
-            legal_moves_list = legal_moves_list :+ intersection
-          }
-        } else {
-          legal_moves_list = legal_moves_list :+ intersection
-        }
+    (for (i <- 0 until size; j <- 0 until size if grid.get(i, j) == None)
+      yield Intersection(i, j)).foldLeft(LegalMoves())((legal_moves, intersection) =>
+      intersection_playability(intersection) match {
+        case Ko      => LegalMoves(legal_moves.legal, legal_moves.ko + intersection)
+        case Legal   => LegalMoves(legal_moves.legal + intersection, legal_moves.ko)
+        case Illegal => legal_moves
       }
-    }
-    LegalMoves(legal_moves_list, ko_moves_list)
+    )
   }
 
   def move_would_capture(intersection: Intersection, color: Color): Boolean = {

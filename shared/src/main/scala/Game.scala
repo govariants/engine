@@ -8,7 +8,7 @@ class Game(val size: Int) {
 
   var turn: Color = Black
 
-  var legal_moves = LegalMoves(List(), List())
+  var legal_moves = LegalMoves()
 
   val board = new Board(size)
 
