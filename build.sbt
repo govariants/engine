@@ -21,7 +21,10 @@ lazy val engine = crossProject(JSPlatform, JVMPlatform)
       "-Xlint",
       "-Xfatal-warnings"
     ),
-    libraryDependencies += "org.scalatest" %%% "scalatest" % "3.1.1" % Test
+    libraryDependencies ++= Seq(
+      "com.lihaoyi"   %%% "fastparse" % "2.3.0",
+      "org.scalatest" %%% "scalatest" % "3.1.1" % Test
+    )
   )
   .jvmSettings(
     libraryDependencies += "org.scala-js" %% "scalajs-stubs" % "1.0.0" % "provided"
