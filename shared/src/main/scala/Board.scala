@@ -85,7 +85,7 @@ class Board(val size: Int)(implicit grid_builder: GridBuilder) {
             virtual_grid.set(stone, None)
           }
         }
-        idx_processed ++= ListBuffer(idx)
+        idx_processed += idx
       }
     }
   }
@@ -117,7 +117,7 @@ class Board(val size: Int)(implicit grid_builder: GridBuilder) {
             }
           }
         }
-        idx_processed ++= ListBuffer(idx)
+        idx_processed += idx
       }
     }
     if (stone_idx == 0) {
@@ -138,16 +138,16 @@ class Board(val size: Int)(implicit grid_builder: GridBuilder) {
   def get_neighbors(intersection: Intersection): ListBuffer[Intersection] = {
     val neighbors = ListBuffer[Intersection]()
     if (intersection.x > 0) {
-      neighbors ++= ListBuffer(Intersection(intersection.x - 1, intersection.y))
+      neighbors += Intersection(intersection.x - 1, intersection.y)
     }
     if (intersection.x < size - 1) {
-      neighbors ++= ListBuffer(Intersection(intersection.x + 1, intersection.y))
+      neighbors += Intersection(intersection.x + 1, intersection.y)
     }
     if (intersection.y > 0) {
-      neighbors ++= ListBuffer(Intersection(intersection.x, intersection.y - 1))
+      neighbors += Intersection(intersection.x, intersection.y - 1)
     }
     if (intersection.y < size - 1) {
-      neighbors ++= ListBuffer(Intersection(intersection.x, intersection.y + 1))
+      neighbors += Intersection(intersection.x, intersection.y + 1)
     }
     neighbors
   }

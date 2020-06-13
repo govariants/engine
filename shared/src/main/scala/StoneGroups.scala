@@ -17,10 +17,10 @@ class StoneGroups(val size: Int, val board: Board)(implicit grid_builder: GridBu
   val color = HashMap[Idx, Color]()
 
   def create(intersection: Intersection, color: Color) = {
-    members += ((idx_counter, ListBuffer(intersection)))
+    members(idx_counter) = ListBuffer(intersection)
     indexes.set(intersection, idx_counter)
-    liberties_count += ((idx_counter, stone_liberties(intersection).size))
-    this.color += ((idx_counter, color))
+    liberties_count(idx_counter) = stone_liberties(intersection).size
+    this.color(idx_counter) = color
     idx_counter += 1
   }
 
@@ -29,7 +29,7 @@ class StoneGroups(val size: Int, val board: Board)(implicit grid_builder: GridBu
   }
 
   def add(intersection: Intersection, idx: Idx) = {
-    members(idx) ++= ListBuffer(intersection)
+    members(idx) += intersection
     liberties_count(idx) -= 1
     for (liberty <- stone_liberties(intersection)) {
       if (liberty_not_counted_in(idx, liberty)) {
