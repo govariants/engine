@@ -3,15 +3,14 @@ package org.govariants.engine
 import scala.collection.mutable.ListBuffer
 
 import scalajs.js.annotation.{ JSExportAll, JSExportTopLevel }
-import org.govariants.engine.datastructures.GridBuilder
 import org.govariants.engine.datastructures.Grid
 
 @JSExportAll
 @JSExportTopLevel("Board")
-class Board(val size: Int)(implicit grid_builder: GridBuilder) {
+class Board(val size: Int) {
   assert(size > 0, "size must be > 0")
 
-  val grid = grid_builder.build[Option[Color]](size, None)
+  val grid = Grid[Option[Color]](size, None)
   val zobrist_hashes = new ZobristHashes(size)
 
   val groups = new StoneGroups(size, this)
@@ -27,7 +26,7 @@ class Board(val size: Int)(implicit grid_builder: GridBuilder) {
       string ++= (j + 1).toString
       string += ' '
       for (i <- 0 until size) {
-        grid.get(i, j) match {
+        grid(i, j) match {
           case Some(Black) => string += 'X'
           case Some(White) => string += 'O'
           case None        => string += '+'
@@ -73,7 +72,7 @@ class Board(val size: Int)(implicit grid_builder: GridBuilder) {
   }
 
   def add_stone_virtual(virtual_grid: Grid[Option[Color]], intersection: Intersection, color: Color): Unit = {
-    virtual_grid.set(intersection, Some(color))
+    virtual_grid(intersection) = Some(color)
     val neighbors = get_neighbors(intersection).filter(is_stone)
 
     if (neighbors.length > 0) {
@@ -82,7 +81,7 @@ class Board(val size: Int)(implicit grid_builder: GridBuilder) {
         val (idx, _color) = stone_idx_and_color(neighbor)
         if (!idx_processed.contains(idx) && _color != color && groups.liberties_count(idx) == 1) {
           for (stone <- groups.members(idx)) {
-            virtual_grid.set(stone, None)
+            virtual_grid(stone) = None
           }
         }
         idx_processed += idx
@@ -91,7 +90,7 @@ class Board(val size: Int)(implicit grid_builder: GridBuilder) {
   }
 
   def add_stone(intersection: Intersection, color: Color): Unit = {
-    grid.set(intersection, Some(color))
+    grid(intersection) = Some(color)
     val neighbors = get_neighbors(intersection).filter(is_stone)
     var stone_idx: Idx = 0
 
@@ -111,7 +110,7 @@ class Board(val size: Int)(implicit grid_builder: GridBuilder) {
             groups.liberties_count(idx) -= 1
             if (groups.liberties_count(idx) == 0) {
               for (stone <- groups.members(idx)) {
-                grid.set(stone, None)
+                grid(stone) = None
               }
               groups.remove(idx)
             }
@@ -127,11 +126,11 @@ class Board(val size: Int)(implicit grid_builder: GridBuilder) {
   }
 
   def is_stone(intersection: Intersection): Boolean = {
-    grid.get(intersection).isDefined
+    grid(intersection).isDefined
   }
 
   def stone_idx_and_color(intersection: Intersection): (Idx, Color) = {
-    val idx = groups.indexes.get(intersection)
+    val idx = groups.indexes(intersection)
     (idx, groups.color(idx))
   }
 
@@ -156,25 +155,25 @@ class Board(val size: Int)(implicit grid_builder: GridBuilder) {
       dead_stones: Iterable[Intersection]
   ): (ListBuffer[Intersection], ListBuffer[Intersection]) = {
     val grid_without_dead_stone = this.grid.copy()
-    val visited = grid_builder.build[Boolean](size, false)
+    val visited = Grid[Boolean](size, false)
     val black_territory = new ListBuffer[Intersection]
     val white_territory = new ListBuffer[Intersection]
     var black_border = false
     var white_border = false
 
     for (dead_stone <- dead_stones) {
-      val dead_stone_idx = groups.indexes.get(dead_stone)
+      val dead_stone_idx = groups.indexes(dead_stone)
       for (stone <- groups.members(dead_stone_idx)) {
-        grid_without_dead_stone.set(stone, None)
+        grid_without_dead_stone(stone) = None
       }
     }
 
-    for (i <- 0 until size; j <- 0 until size if visited.get(i, j) == false) {
+    for (i <- 0 until size; j <- 0 until size if !visited(i, j)) {
       val intersection = Intersection(i, j)
-      visited.set(intersection, true)
+      visited(intersection) = true
       black_border = false
       white_border = false
-      grid_without_dead_stone.get(i, j) match {
+      grid_without_dead_stone(i, j) match {
         case Some(Black) => black_territory += intersection
         case Some(White) => white_territory += intersection
         case None => {
@@ -190,16 +189,16 @@ class Board(val size: Int)(implicit grid_builder: GridBuilder) {
         intersection: Intersection,
         territory: ListBuffer[Intersection]
     ): Unit = {
-      visited.set(intersection, true)
+      visited(intersection) = true
       territory += intersection
       for (neighbor <- get_neighbors(intersection)) {
-        if (grid_without_dead_stone.get(neighbor).isDefined) {
-          grid.get(neighbor) match {
+        if (grid_without_dead_stone(neighbor).isDefined) {
+          grid(neighbor) match {
             case Some(Black) => black_border = true
             case Some(White) => white_border = true
             case None        =>
           }
-        } else if (!visited.get(neighbor)) {
+        } else if (!visited(neighbor)) {
           recursive_compute_territories(neighbor, territory)
         }
       }

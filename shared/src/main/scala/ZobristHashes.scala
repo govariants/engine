@@ -20,7 +20,7 @@ class ZobristHashes(val size: Int) {
   def compute_hash(grid: Grid[Option[Color]]): Long = {
     var hash = 0L
     for (i <- 0 until size; j <- 0 until size) {
-      grid.get(i, j) match {
+      grid(i, j) match {
         case Some(Black) => hash ^= zobrist_table(j * size + i)(0)
         case Some(White) => hash ^= zobrist_table(j * size + i)(1)
         case None        =>
