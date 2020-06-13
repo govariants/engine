@@ -14,7 +14,7 @@ class Board(val size: Int)(implicit grid_builder: GridBuilder) {
   val grid = grid_builder.build[Option[Color]](size, None)
   val zobrist_hashes = new ZobristHashes(size)
 
-  val groups: StoneGroups = new StoneGroups(size, this)
+  val groups = new StoneGroups(size, this)
 
   override def toString(): String = {
     val string = new StringBuilder("  ")
@@ -72,12 +72,12 @@ class Board(val size: Int)(implicit grid_builder: GridBuilder) {
     zobrist_hashes.position_repeat(tmp_grid)
   }
 
-  def add_stone_virtual(virtual_grid: Grid[Option[Color]], intersection: Intersection, color: Color) = {
+  def add_stone_virtual(virtual_grid: Grid[Option[Color]], intersection: Intersection, color: Color): Unit = {
     virtual_grid.set(intersection, Some(color))
-    val neighbors: ListBuffer[Intersection] = get_neighbors(intersection).filter(is_stone)
+    val neighbors = get_neighbors(intersection).filter(is_stone)
 
     if (neighbors.length > 0) {
-      val idx_processed: ListBuffer[Idx] = ListBuffer()
+      val idx_processed = ListBuffer[Idx]()
       for (neighbor <- neighbors) {
         val (idx, _color) = stone_idx_and_color(neighbor)
         if (!idx_processed.contains(idx) && _color != color && groups.liberties_count(idx) == 1) {
@@ -90,13 +90,13 @@ class Board(val size: Int)(implicit grid_builder: GridBuilder) {
     }
   }
 
-  def add_stone(intersection: Intersection, color: Color) = {
+  def add_stone(intersection: Intersection, color: Color): Unit = {
     grid.set(intersection, Some(color))
-    val neighbors: ListBuffer[Intersection] = get_neighbors(intersection).filter(is_stone)
+    val neighbors = get_neighbors(intersection).filter(is_stone)
     var stone_idx: Idx = 0
 
     if (neighbors.length > 0) {
-      val idx_processed: ListBuffer[Idx] = ListBuffer()
+      val idx_processed = ListBuffer[Idx]()
       for (neighbor <- neighbors) {
         val (idx, _color) = stone_idx_and_color(neighbor)
         if (!idx_processed.contains(idx)) {
@@ -136,7 +136,7 @@ class Board(val size: Int)(implicit grid_builder: GridBuilder) {
   }
 
   def get_neighbors(intersection: Intersection): ListBuffer[Intersection] = {
-    val neighbors: ListBuffer[Intersection] = ListBuffer()
+    val neighbors = ListBuffer[Intersection]()
     if (intersection.x > 0) {
       neighbors ++= ListBuffer(Intersection(intersection.x - 1, intersection.y))
     }
