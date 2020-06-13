@@ -5,7 +5,8 @@ import java.util.Scanner
 
 object Main extends App {
   val size = 9
-  var game = new Game(size)
+  val komi = 7.0
+  val game = new Game(size, komi)
   game.start()
   game.display()
 

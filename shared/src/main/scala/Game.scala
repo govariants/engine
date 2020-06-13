@@ -4,7 +4,7 @@ import scalajs.js.annotation.{ JSExportAll, JSExportTopLevel }
 
 @JSExportAll
 @JSExportTopLevel("Game")
-class Game(val size: Int) {
+class Game(val size: Int, komi: Double) {
 
   var turn: Color = Black
 
@@ -40,8 +40,8 @@ class Game(val size: Int) {
     compute_playable_action()
   }
 
-  def compute_score() = {
-    //board.score()
+  def compute_score(dead_stones: Iterable[Intersection]) = {
+    board.score(komi, dead_stones)
   }
 
   def switch_turn() = {
@@ -49,7 +49,9 @@ class Game(val size: Int) {
   }
 
   def display() = {
-    println(board.toString())
+    println(toString())
     println()
   }
+
+  override def toString(): String = board.toString()
 }

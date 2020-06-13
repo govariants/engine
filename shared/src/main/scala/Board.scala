@@ -153,7 +153,7 @@ class Board(val size: Int)(implicit grid_builder: GridBuilder) {
   }
 
   def compute_territories(
-      dead_stones: ListBuffer[Intersection]
+      dead_stones: Iterable[Intersection]
   ): (ListBuffer[Intersection], ListBuffer[Intersection]) = {
     val grid_without_dead_stone = this.grid.copy()
     val visited = grid_builder.build[Boolean](size, false)
@@ -208,7 +208,7 @@ class Board(val size: Int)(implicit grid_builder: GridBuilder) {
     (black_territory, white_territory)
   }
 
-  def score(komi: Int, dead_stones: ListBuffer[Intersection]): (Int, Int) = {
+  def score(komi: Double, dead_stones: Iterable[Intersection]): (Double, Double) = {
     val (black_territory, white_territory) = compute_territories(dead_stones)
     (black_territory.size, white_territory.size + komi)
   }
