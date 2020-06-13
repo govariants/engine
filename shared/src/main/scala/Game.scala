@@ -1,18 +1,14 @@
 package org.govariants.engine
 
-import scalajs.js.annotation.{ JSExportAll, JSExportTopLevel }
-
-@JSExportAll
-@JSExportTopLevel("Game")
 class Game(val size: Int, komi: Double) {
 
   var turn: Color = Black
 
   var legal_moves = LegalMoves()
 
-  val board = new Board(size)
+  protected val board = new Board(size)
 
-  def compute_playable_action(): List[String] = {
+  def playable_actions(): List[String] = {
     val move_turn = turn match {
       case Black => "black_turn"
       case White => "white_turn"
@@ -22,11 +18,11 @@ class Game(val size: Int, komi: Double) {
 
   def start(): List[String] = {
     legal_moves = board.legal_moves(turn)
-    compute_playable_action()
+    playable_actions()
   }
 
   def move_is_legal(intersection: Intersection): Boolean = {
-    legal_moves.legal.contains(intersection)
+    legal_moves.legal(intersection)
   }
 
   def play(intersection: Intersection): List[String] = {
@@ -37,7 +33,7 @@ class Game(val size: Int, komi: Double) {
     switch_turn()
     legal_moves = board.legal_moves(turn)
 
-    compute_playable_action()
+    playable_actions()
   }
 
   def compute_score(dead_stones: Iterable[Intersection]) = {

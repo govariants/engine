@@ -3,12 +3,8 @@ package org.govariants.engine
 import scala.collection.mutable.HashMap
 import scala.collection.mutable.ListBuffer
 
-import scalajs.js.annotation.{ JSExportAll, JSExportTopLevel }
-
 import datastructures.Grid
 
-@JSExportAll
-@JSExportTopLevel("StoneGroups")
 class StoneGroups(val size: Int, val board: Board) {
 
   var idx_counter: Idx = 1

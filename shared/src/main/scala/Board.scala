@@ -2,11 +2,8 @@ package org.govariants.engine
 
 import scala.collection.mutable.ListBuffer
 
-import scalajs.js.annotation.{ JSExportAll, JSExportTopLevel }
 import org.govariants.engine.datastructures.Grid
 
-@JSExportAll
-@JSExportTopLevel("Board")
 class Board(val size: Int) {
   assert(size > 0, "size must be > 0")
 

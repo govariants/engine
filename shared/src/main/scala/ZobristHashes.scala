@@ -4,10 +4,6 @@ import scala.util.Random
 import org.govariants.engine.datastructures.Grid
 import scala.collection.mutable.ListBuffer
 
-import scalajs.js.annotation.{ JSExportAll, JSExportTopLevel }
-
-@JSExportAll
-@JSExportTopLevel("ZobristHashes")
 class ZobristHashes(val size: Int) {
   val random_generator = new Random
   val zobrist_table = Array.ofDim[Long](size * size, 2)
