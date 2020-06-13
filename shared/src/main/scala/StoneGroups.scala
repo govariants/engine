@@ -9,7 +9,6 @@ import org.govariants.engine.datastructures.GridBuilder
 @JSExportAll
 @JSExportTopLevel("StoneGroups")
 class StoneGroups(val size: Int, val board: Board)(implicit grid_builder: GridBuilder) {
-  type Idx = Int
 
   var idx_counter: Idx = 1
   val members: HashMap[Idx, ListBuffer[Intersection]] = HashMap()

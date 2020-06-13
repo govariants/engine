@@ -11,8 +11,6 @@ import org.govariants.engine.datastructures.Grid
 class Board(val size: Int)(implicit grid_builder: GridBuilder) {
   assert(size > 0, "size must be > 0")
 
-  type Idx = Int
-
   val grid = grid_builder.build[Option[Color]](size, None)
   val zobrist_hashes = new ZobristHashes(size)
 
