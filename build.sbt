@@ -28,6 +28,7 @@ lazy val engine = crossProject(JSPlatform, JVMPlatform)
       "org.scalatest" %%% "scalatest" % "3.1.1" % Test
     )
   )
+  .jsSettings(scalaJSLinkerConfig ~= { _.withModuleKind(ModuleKind.CommonJSModule) })
   .jvmSettings(
     libraryDependencies += "org.scala-js" %% "scalajs-stubs" % "1.0.0" % "provided"
   )

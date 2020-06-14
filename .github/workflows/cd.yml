@@ -1,0 +1,37 @@
+name: CD
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - "*"
+
+jobs:
+  deploy-sonatype:
+    name: Deploy to Sonatype
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Setup GPG
+        uses: olafurpg/setup-gpg@v2
+      - name: Deploy JVM version to Sonatype
+        run: sbt ci-release
+        env:
+          PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
+          PGP_SECRET: ${{ secrets.PGP_SECRET }}
+          SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
+          SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
+  deploy-npm:
+    name: Deploy to NPM Registry
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Set version in package.json
+        run: sed 's/$VERSION/${{ github.ref }}/' < package.json.in > package.json
+      - name: Build JS library
+        run: |
+          make jspackage
+      - name: Deploy to NPM Registry
+        run: npm publish --access public
