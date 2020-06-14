@@ -1,10 +1,8 @@
 name: CD
 on:
   push:
-    branches:
-      - master
     tags:
-      - "*"
+      - "v*"
 
 jobs:
   deploy-sonatype:
@@ -15,7 +13,7 @@ jobs:
         uses: actions/checkout@v2
       - name: Setup GPG
         uses: olafurpg/setup-gpg@v2
-      - name: Deploy JVM version to Sonatype
+      - name: Deploy to Sonatype
         run: sbt ci-release
         env:
           PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
@@ -28,10 +26,16 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Set version in package.json
-        run: sed 's/$VERSION/${{ github.ref }}/' < package.json.in > package.json
-      - name: Build JS library
+      - name: Prepare JS package
         run: |
-          make jspackage
+          sbt fullOptJS
+          cp js/src/main/resources/* jspackage
+          cp js/target/scala-2.13/engine-opt.js jspackage/engine.js
+          sed 's/$VERSION/'"${REF##*/v}/" < jspackage/package.json.in > jspackage/package.json
+        env:
+          REF: ${{ github.ref }}
       - name: Deploy to NPM Registry
         run: npm publish --access public
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        working-directory: jspackage
