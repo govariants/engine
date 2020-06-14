@@ -1,13 +1,14 @@
 package org.govariants.engine
 
-import scala.util.Random
-import org.govariants.engine.datastructures.Grid
-import scala.collection.mutable.ListBuffer
+import collection.mutable
+import util.Random
+
+import datastructures.Grid
 
 class ZobristHashes(val size: Int) {
   val random_generator = new Random
   val zobrist_table = Array.ofDim[Long](size * size, 2)
-  var hashes = new ListBuffer[Long]
+  var hashes = new mutable.ListBuffer[Long]
 
   for (position <- 0 until size * size; color <- 0 until 2) {
     zobrist_table(position)(color) = random_generator.nextLong

@@ -1,9 +1,8 @@
 package org.govariants.engine;
 
-import scala.scalajs.js.{ Array => JSArray, Iterable => JSIterable, Tuple2 => JSTuple2 }
-import scala.scalajs.js.annotation.JSExport
-import scala.scalajs.js.JSConverters._
-import scala.scalajs.js.annotation.JSExportTopLevel
+import scalajs.js.{ Array => JSArray, Iterable => JSIterable, Tuple2 => JSTuple2 }
+import scalajs.js.annotation.{ JSExport, JSExportTopLevel }
+import scalajs.js.JSConverters._
 
 @JSExportTopLevel("Game")
 class JSGame(size: Int, komi: Double) extends Game(size, komi) {

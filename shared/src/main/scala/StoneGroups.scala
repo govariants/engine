@@ -1,20 +1,19 @@
 package org.govariants.engine
 
-import scala.collection.mutable.HashMap
-import scala.collection.mutable.ListBuffer
+import collection.mutable
 
 import datastructures.Grid
 
 class StoneGroups(val size: Int, val board: Board) {
 
   var idx_counter: Idx = 1
-  val members = HashMap[Idx, ListBuffer[Intersection]]()
+  val members = mutable.HashMap[Idx, mutable.ListBuffer[Intersection]]()
   val indexes = Grid[Idx](size, 0)
-  val liberties_count = HashMap[Idx, Int]()
-  val color = HashMap[Idx, Color]()
+  val liberties_count = mutable.HashMap[Idx, Int]()
+  val color = mutable.HashMap[Idx, Color]()
 
   def create(intersection: Intersection, color: Color) = {
-    members(idx_counter) = ListBuffer(intersection)
+    members(idx_counter) = mutable.ListBuffer(intersection)
     indexes(intersection) = idx_counter
     liberties_count(idx_counter) = stone_liberties(intersection).size
     this.color(idx_counter) = color

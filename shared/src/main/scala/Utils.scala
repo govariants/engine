@@ -1,6 +1,7 @@
-package org.govariants.engine
+package org.govariants
+package engine
 
-import org.govariants.sgfparser.{ GameTree, Move, Pass, Rectangular, Square }
+import sgfparser.{ GameTree, Move, Pass, Rectangular, Square }
 
 object Utils {
   def main_line_to_board(game_tree: GameTree): Board = {

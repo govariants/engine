@@ -1,6 +1,7 @@
 package org.govariants.engine
 
-import scala.io.StdIn.readLine
+import io.StdIn.readLine
+
 import java.util.Scanner
 
 object Main extends App {

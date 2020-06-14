@@ -1,6 +1,6 @@
 package org.govariants.engine
 
-import scala.collection.mutable.ListBuffer
+import collection.mutable
 
 import org.govariants.engine.datastructures.Grid
 
@@ -73,7 +73,7 @@ class Board(val size: Int) {
     val neighbors = get_neighbors(intersection).filter(is_stone)
 
     if (neighbors.length > 0) {
-      val idx_processed = ListBuffer[Idx]()
+      val idx_processed = mutable.ListBuffer[Idx]()
       for (neighbor <- neighbors) {
         val (idx, _color) = stone_idx_and_color(neighbor)
         if (!idx_processed.contains(idx) && _color != color && groups.liberties_count(idx) == 1) {
@@ -92,7 +92,7 @@ class Board(val size: Int) {
     var stone_idx: Idx = 0
 
     if (neighbors.length > 0) {
-      val idx_processed = ListBuffer[Idx]()
+      val idx_processed = mutable.ListBuffer[Idx]()
       for (neighbor <- neighbors) {
         val (idx, _color) = stone_idx_and_color(neighbor)
         if (!idx_processed.contains(idx)) {
@@ -131,8 +131,8 @@ class Board(val size: Int) {
     (idx, groups.color(idx))
   }
 
-  def get_neighbors(intersection: Intersection): ListBuffer[Intersection] = {
-    val neighbors = ListBuffer[Intersection]()
+  def get_neighbors(intersection: Intersection): mutable.ListBuffer[Intersection] = {
+    val neighbors = mutable.ListBuffer[Intersection]()
     if (intersection.x > 0) {
       neighbors += Intersection(intersection.x - 1, intersection.y)
     }
@@ -150,11 +150,11 @@ class Board(val size: Int) {
 
   def compute_territories(
       dead_stones: Iterable[Intersection]
-  ): (ListBuffer[Intersection], ListBuffer[Intersection]) = {
+  ): (mutable.ListBuffer[Intersection], mutable.ListBuffer[Intersection]) = {
     val grid_without_dead_stone = this.grid.copy()
     val visited = Grid[Boolean](size, false)
-    val black_territory = new ListBuffer[Intersection]
-    val white_territory = new ListBuffer[Intersection]
+    val black_territory = new mutable.ListBuffer[Intersection]
+    val white_territory = new mutable.ListBuffer[Intersection]
     var black_border = false
     var white_border = false
 
@@ -174,7 +174,7 @@ class Board(val size: Int) {
         case Some(Black) => black_territory += intersection
         case Some(White) => white_territory += intersection
         case None => {
-          val territory = new ListBuffer[Intersection]
+          val territory = new mutable.ListBuffer[Intersection]
           recursive_compute_territories(intersection, territory)
           if (black_border && !white_border) black_territory ++= territory
           if (white_border && !black_border) white_territory ++= territory
@@ -184,7 +184,7 @@ class Board(val size: Int) {
 
     def recursive_compute_territories(
         intersection: Intersection,
-        territory: ListBuffer[Intersection]
+        territory: mutable.ListBuffer[Intersection]
     ): Unit = {
       visited(intersection) = true
       territory += intersection
