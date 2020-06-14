@@ -3,6 +3,8 @@ package org.govariants.engine
 import org.scalatest.funsuite.AnyFunSuite
 import scala.collection.mutable.ListBuffer
 
+import org.govariants.sgfparser.SGFParser
+
 class BoardTest extends AnyFunSuite {
 
   test("Simple capture one stone") {
@@ -128,7 +130,7 @@ class BoardTest extends AnyFunSuite {
   def board_from_sgf(sgf_string: String): Board = {
     val parse_result = SGFParser.parse_sgf_string(sgf_string)
     if (parse_result.isFailure) fail()
-    parse_result.get(0).main_line_to_board
+    Utils.main_line_to_board(parse_result.get(0))
   }
 
   def board_from_string(board_str: String): Board = {
